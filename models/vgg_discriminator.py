@@ -5,9 +5,9 @@ import torch.nn as nn
 VGG descriminator (D) for ESRGAN
 https://github.com/xinntao/BasicSR/blob/master/basicsr/models/archs/discriminator_arch.py
 '''
-class Discriminator_VGG_128(nn.Module):
+class VGGDiscriminator128(nn.Module):
     def __init__(self, in_nc, nf):
-        super(Discriminator_VGG_128, self).__init__()
+        super(VGGDiscriminator128, self).__init__()
         # [64, 128, 128]
         self.conv0_0 = nn.Conv2d(in_nc, nf, 3, 1, 1, bias=True)
         self.conv0_1 = nn.Conv2d(nf, nf, 4, 2, 1, bias=False)

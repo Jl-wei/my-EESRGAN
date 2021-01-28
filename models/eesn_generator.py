@@ -6,9 +6,10 @@ import utils as mutil
 import kornia
 from .rrdbnet import RRDB, RRDBNet
 
-class ESRGAN_EESN(nn.Module):
+
+class EESNGenerator(nn.Module):
   def __init__(self, in_nc, out_nc, nf, nb):
-    super(ESRGAN_EESN, self).__init__()
+    super(EESNGenerator, self).__init__()
     self.netRG = RRDBNet(in_nc, out_nc, nf, nb)
     self.netE = EESN()
 
