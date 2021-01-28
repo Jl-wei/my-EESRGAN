@@ -1,0 +1,14 @@
+opencv_python_headless
+tqdm
+matplotlib
+albumentations
+torchvision
+pandas
+numpy
+pytest
+torch
+kornia
+dataclasses
+Pillow
+pycocotools
+tensorboard
