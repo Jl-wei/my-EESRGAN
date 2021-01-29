@@ -1,6 +1,5 @@
 import json
 import torch
-import cv2
 import math
 from pathlib import Path
 from collections import OrderedDict
