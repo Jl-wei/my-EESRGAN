@@ -9,5 +9,9 @@
             "HR_img_dir": "/Users/jlwei/workspace/datasets/DetectionPatches_256x256/Potsdam_ISPRS/HR/x4/",
             "LR_img_dir": "/Users/jlwei/workspace/datasets/DetectionPatches_256x256/Potsdam_ISPRS/LR/x4/"
         }
+    },
+    "path": {
+        "pretrained_models": "saved/pretrained_models",
+        "training_state": "saved/training_state"
     }
 }
