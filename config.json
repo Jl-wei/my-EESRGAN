@@ -1,0 +1,13 @@
+{
+    "name": "EESRGAN",
+    "data_loader": {
+        "train": {
+            "HR_img_dir": "/Users/jlwei/workspace/datasets/DetectionPatches_256x256/Potsdam_ISPRS/HR/x4/",
+            "LR_img_dir": "/Users/jlwei/workspace/datasets/DetectionPatches_256x256/Potsdam_ISPRS/LR/x4/"
+        }, 
+        "valid": {
+            "HR_img_dir": "/Users/jlwei/workspace/datasets/DetectionPatches_256x256/Potsdam_ISPRS/HR/x4/",
+            "LR_img_dir": "/Users/jlwei/workspace/datasets/DetectionPatches_256x256/Potsdam_ISPRS/LR/x4/"
+        }
+    }
+}

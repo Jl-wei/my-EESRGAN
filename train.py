@@ -1,9 +1,8 @@
 import torch
 import numpy as np
 import data
-'''
-python train.py -c config_GAN.json
-'''
+import utils
+
 
 # fix random seeds for reproducibility
 SEED = 111
@@ -14,17 +13,17 @@ np.random.seed(SEED)
 
 def main(config):
     train_data_loader = data.COWCDataLoader(
-        '/Users/jlwei/workspace/datasets/DetectionPatches_256x256/Potsdam_ISPRS/HR/x4/',
-        '/Users/jlwei/workspace/datasets/DetectionPatches_256x256/Potsdam_ISPRS/LR/x4/', 
+        config["data_loader"]["train"]["HR_img_dir"],
+        config["data_loader"]["train"]["LR_img_dir"],
         1, training = True)
     valid_data_loader = data.COWCDataLoader(
-        '/Users/jlwei/workspace/datasets/DetectionPatches_256x256/Potsdam_ISPRS/HR/x4/',
-        '/Users/jlwei/workspace/datasets/DetectionPatches_256x256/Potsdam_ISPRS/LR/x4/', 
+        config["data_loader"]["valid"]["HR_img_dir"],
+        config["data_loader"]["valid"]["LR_img_dir"],
         1, training = False)
 
     # import pdb; pdb.set_trace()
 
 
 if __name__ == '__main__':
-    config = {}
+    config = utils.read_json('./config.json')
     main(config)
