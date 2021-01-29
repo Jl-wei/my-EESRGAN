@@ -1,5 +1,55 @@
 {
     "name": "EESRGAN",
+    "network_G": {
+        "in_nc": 3,
+        "out_nc": 3,
+        "nf": 64,
+        "nb": 23,
+        "args": {}
+    },
+    "network_D": {
+        "in_nc": 3,
+        "nf": 64,
+        "args": {}
+    },
+    "optimizer": {
+        "type": "SGD",
+        "args":{
+            "lr_G": 0.0001,
+            "weight_decay_G": 0,
+            "beta1_G": 0.9,
+            "beta2_G": 0.99,
+
+            "lr_D": 0.0001,
+            "weight_decay_D": 0,
+            "beta1_D": 0.9,
+            "beta2_D": 0.99
+        }
+    },
+    "train": {
+        "niter": 1,
+        "warmup_iter": -1,
+        "pixel_criterion": "l1",
+        "pixel_weight": 0.01,
+        "feature_criterion": "l1",
+        "feature_weight": 1,
+
+        "gan_type": "ragan",
+        "gan_weight": 0.001,
+        "D_update_ratio": 1,
+        "D_init_iters": 0,
+        "manual_seed": 10,
+        "val_freq": 1000,
+
+        "save_dir": "saved/",
+        "save_period": 1,
+        "verbosity": 2,
+
+        "monitor": "min val_loss",
+        "early_stop": 10,
+
+        "tensorboard": true
+    },
     "data_loader": {
         "train": {
             "HR_img_dir": "/Users/jlwei/workspace/datasets/DetectionPatches_256x256/Potsdam_ISPRS/HR/x4/",
@@ -10,8 +60,14 @@
             "LR_img_dir": "/Users/jlwei/workspace/datasets/DetectionPatches_256x256/Potsdam_ISPRS/LR/x4/"
         }
     },
+    "pretrained_models": {
+        "path": "saved/pretrained_models",
+        "G": "saved/pretrained_models/170000_G.pth",
+        "D": "saved/pretrained_models/170000_D.pth",
+        "FRCNN": "saved/pretrained_models/170000_FRCNN.pth",
+        "strict_load": true
+    },
     "path": {
-        "pretrained_models": "saved/pretrained_models",
         "training_state": "saved/training_state"
     }
 }
