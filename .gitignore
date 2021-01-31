@@ -7,6 +7,10 @@ __pycache__/
 # OS
 .DS_Store
 
+# dataset
+dataset/*
+!dataset/README.md
+
 # saved
 saved/pretrained_models/*
 saved/training_state/*
