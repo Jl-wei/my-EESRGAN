@@ -58,6 +58,12 @@
         "valid": {
             "HR_img_dir": "/Users/jlwei/workspace/datasets/DetectionPatches_256x256/Potsdam_ISPRS/HR/x4/",
             "LR_img_dir": "/Users/jlwei/workspace/datasets/DetectionPatches_256x256/Potsdam_ISPRS/LR/x4/"
+        },
+        "args":{
+            "batch_size": 2,
+            "shuffle": true,
+            "validation_split": 0.0,
+            "num_workers": 2
         }
     },
     "pretrained_models": {
@@ -69,5 +75,8 @@
     },
     "path": {
         "training_state": "saved/training_state"
+    },
+    "logger": {
+        "print_freq": 100
     }
 }
