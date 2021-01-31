@@ -10,8 +10,7 @@ from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 import models
 from models.losses import GANLoss, CharbonnierLoss
 from .gan_base_model import GANBaseModel
-from detection.utils import reduce_dict
-
+from detection.engine import evaluate, evaluate_save
 
 
 logger = logging.getLogger('base')
@@ -116,7 +115,7 @@ class EESN_FRCNN_GAN(GANBaseModel):
                                             betas=(self.configO['beta1_D'], self.configO['beta2_D']))
         self.optimizers.append(self.optimizer_D)
 
-        # FRCNN -- use weigt decay
+        # FRCNN -- use weight decay
         FRCNN_params = [p for p in self.netFRCNN.parameters() if p.requires_grad]
         self.optimizer_FRCNN = torch.optim.SGD(FRCNN_params, lr=0.005,
                                                momentum=0.9, weight_decay=0.0005)
@@ -125,6 +124,22 @@ class EESN_FRCNN_GAN(GANBaseModel):
         # self.print_network()  # print network
         self.load()  # load G and D if needed
 
+
+    def test(self, valid_data_loader, train = True, testResult = False):
+        self.netG.eval()
+        self.netFRCNN.eval()
+        self.targets = valid_data_loader
+        if testResult == False:
+            with torch.no_grad():
+                self.fake_H, self.final_SR, self.x_learned_lap_fake, self.x_lap = self.netG(self.var_L)
+                self.x_lap_HR = kornia.laplacian(self.var_H, 3)
+        if train == True:
+            evaluate(self.netG, self.netFRCNN, self.targets, self.device)
+        if testResult == True:
+            evaluate(self.netG, self.netFRCNN, self.targets, self.device)
+            evaluate_save(self.netG, self.netFRCNN, self.targets, self.device, self.config)
+        self.netG.train()
+        self.netFRCNN.train()
 
     '''
     The main repo did not use collate_fn and image read has different flags
@@ -162,12 +177,13 @@ class EESN_FRCNN_GAN(GANBaseModel):
             pred_g_fake = self.netD(self.fake_H)
             if self.configT['gan_type'] == 'gan':
                 l_g_gan = self.l_gan_w * self.cri_gan(pred_g_fake, True)
+                l_g_total += l_g_gan
             elif self.configT['gan_type'] == 'ragan':
                 pred_d_real = self.netD(self.var_ref).detach()
                 l_g_gan = self.l_gan_w * (
                     self.cri_gan(pred_d_real - torch.mean(pred_g_fake), False) +
                     self.cri_gan(pred_g_fake - torch.mean(pred_d_real), True)) / 2
-            l_g_total += l_g_gan
+                l_g_total += l_g_gan
 
             # EESN calculate loss
             self.lap_HR = kornia.laplacian(self.var_H, 3)

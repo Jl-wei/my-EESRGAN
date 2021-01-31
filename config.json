@@ -74,7 +74,9 @@
         "strict_load": true
     },
     "path": {
-        "training_state": "saved/training_state"
+        "training_state": "saved/training_state",
+        "output_images": "saved/val_images_cars_new",
+        "Test_Result_SR": "saved/Test_Result_SR/"
     },
     "logger": {
         "print_freq": 100
