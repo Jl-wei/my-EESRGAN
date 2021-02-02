@@ -19,7 +19,11 @@ def main(config):
     train_data_loader = data.COWCDataLoader(
         config["data_loader"]["train"]["HR_img_dir"],
         config["data_loader"]["train"]["LR_img_dir"],
-        1, training = True)
+        config["data_loader"]["args"]["batch_size"], 
+        config["data_loader"]["args"]["shuffle"], 
+        config["data_loader"]["args"]["validation_split"], 
+        config["data_loader"]["args"]["num_workers"], 
+        training = True)
     valid_data_loader = data.COWCDataLoader(
         config["data_loader"]["valid"]["HR_img_dir"],
         config["data_loader"]["valid"]["LR_img_dir"],
