@@ -8,6 +8,7 @@ from torch.nn.parallel import DataParallel, DistributedDataParallel
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
 import models
+import models.lr_scheduler as lr_scheduler
 from models.losses import GANLoss, CharbonnierLoss
 from .gan_base_model import GANBaseModel
 from detection.engine import evaluate, evaluate_save
@@ -23,6 +24,7 @@ class EESN_FRCNN_GAN(GANBaseModel):
         self.configD = config['network_D']
         self.configT = config['train']
         self.configO = config['optimizer']['args']
+        self.configS = config['lr_scheduler']
         self.config = config
         self.device = device
 
@@ -120,6 +122,25 @@ class EESN_FRCNN_GAN(GANBaseModel):
         self.optimizer_FRCNN = torch.optim.SGD(FRCNN_params, lr=0.005,
                                                momentum=0.9, weight_decay=0.0005)
         self.optimizers.append(self.optimizer_FRCNN)
+
+        # schedulers
+        if self.configS['type'] == 'MultiStepLR':
+            for optimizer in self.optimizers:
+                self.schedulers.append(
+                    lr_scheduler.MultiStepLR_Restart(optimizer, self.configS['args']['lr_steps'],
+                                                     restarts=self.configS['args']['restarts'],
+                                                     weights=self.configS['args']['restart_weights'],
+                                                     gamma=self.configS['args']['lr_gamma'],
+                                                     clear_state=False))
+        elif self.configS['type'] == 'CosineAnnealingLR_Restart':
+            for optimizer in self.optimizers:
+                self.schedulers.append(
+                    lr_scheduler.CosineAnnealingLR_Restart(
+                        optimizer, self.configS['args']['T_period'], eta_min=self.configS['args']['eta_min'],
+                        restarts=self.configS['args']['restarts'], weights=self.configS['args']['restart_weights']))
+        else:
+            raise NotImplementedError('MultiStepLR learning rate scheme is enough.')
+        print(self.configS['args']['restarts'])
 
         # self.print_network()  # print network
         self.load()  # load G and D if needed
