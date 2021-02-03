@@ -27,7 +27,7 @@
         }
     },
     "train": {
-        "niter": 1000,
+        "niter": 10000,
         "warmup_iter": -1,
         "pixel_criterion": "l1",
         "pixel_weight": 0.01,
@@ -56,8 +56,8 @@
             "LR_img_dir": "dataset/Potsdam_ISPRS/LR/x4/"
         }, 
         "valid": {
-            "HR_img_dir": "dataset/Potsdam_ISPRS/HR/x4/",
-            "LR_img_dir": "dataset/Potsdam_ISPRS/LR/x4/"
+            "HR_img_dir": "dataset/Potsdam_ISPRS/HR/x4/valid/",
+            "LR_img_dir": "dataset/Potsdam_ISPRS/LR/x4/valid/"
         },
         "args":{
             "batch_size": 4,

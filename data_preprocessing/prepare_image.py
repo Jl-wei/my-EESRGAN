@@ -14,8 +14,9 @@ class PrepareImage():
     def __init__(self):
         self.up_scale = 4
         self.mod_scale = 4
-        self.sourcedir = '/Users/jlwei/workspace/datasets/DetectionPatches_256x256/Potsdam_ISPRS'
-        self.savedir = '/Users/jlwei/workspace/datasets/DetectionPatches_256x256/Potsdam_ISPRS'
+        self.sourcedir = 'dataset/Potsdam_ISPRS'
+        self.savedir = 'dataset/Potsdam_ISPRS'
+        self.valid_percent = 0.2
 
     def generate_lr_hr_bic(self):
         self.mkdir()
@@ -23,40 +24,21 @@ class PrepareImage():
         self.copy_annotations()
 
     def mkdir(self):
-        self.saveHRpath = os.path.join(self.savedir, 'HR', 'x' + str(self.mod_scale))
-        self.saveLRpath = os.path.join(self.savedir, 'LR', 'x' + str(self.up_scale))
-        self.saveBicpath = os.path.join(self.savedir, 'Bic', 'x' + str(self.up_scale))
+        self.hr_path = os.path.join(self.savedir, 'HR', 'x' + str(self.mod_scale))
+        self.lr_path = os.path.join(self.savedir, 'LR', 'x' + str(self.up_scale))
+        self.bic_path = os.path.join(self.savedir, 'Bic', 'x' + str(self.up_scale))
 
-        if not os.path.isdir(self.sourcedir):
-            print('Error: No source data found')
-            exit(0)
-        if not os.path.isdir(self.savedir):
-            os.mkdir(self.savedir)
+        self.valid_hr_path = os.path.join(self.hr_path, 'valid')
+        self.valid_lr_path = os.path.join(self.lr_path, 'valid')
+        self.valid_bic_path = os.path.join(self.bic_path, 'valid')
 
-        if not os.path.isdir(os.path.join(self.savedir, 'HR')):
-            os.mkdir(os.path.join(self.savedir, 'HR'))
-        if not os.path.isdir(os.path.join(self.savedir, 'LR')):
-            os.mkdir(os.path.join(self.savedir, 'LR'))
-        if not os.path.isdir(os.path.join(self.savedir, 'Bic')):
-            os.mkdir(os.path.join(self.savedir, 'Bic'))
-
-        if not os.path.isdir(self.saveHRpath):
-            os.mkdir(self.saveHRpath)
-        else:
-            print('It will cover ' + str(self.saveHRpath))
-
-        if not os.path.isdir(self.saveLRpath):
-            os.mkdir(self.saveLRpath)
-        else:
-            print('It will cover ' + str(self.saveLRpath))
-
-        if not os.path.isdir(self.saveBicpath):
-            os.mkdir(self.saveBicpath)
-        else:
-            print('It will cover ' + str(self.saveBicpath))
+        os.makedirs(self.valid_hr_path, exist_ok=True)
+        os.makedirs(self.valid_lr_path, exist_ok=True)
+        os.makedirs(self.valid_bic_path, exist_ok=True)
 
     def generate_img(self):
         filepaths = [f for f in os.listdir(self.sourcedir) if f.endswith('.jpg') and not f.endswith('check.jpg')]
+        filepaths.sort()
         num_files = len(filepaths)
         # prepare data with augementation
         for i in range(num_files):
@@ -77,12 +59,18 @@ class PrepareImage():
             # bic
             image_Bic = imresize_np(image_LR, self.up_scale, True)
 
-            cv2.imwrite(os.path.join(self.saveHRpath, filename), image_HR)
-            cv2.imwrite(os.path.join(self.saveLRpath, filename), image_LR)
-            cv2.imwrite(os.path.join(self.saveBicpath, filename), image_Bic)
+            if i < num_files * (1 - self.valid_percent):
+                cv2.imwrite(os.path.join(self.hr_path, filename), image_HR)
+                cv2.imwrite(os.path.join(self.lr_path, filename), image_LR)
+                cv2.imwrite(os.path.join(self.bic_path, filename), image_Bic)
+            else:
+                cv2.imwrite(os.path.join(self.valid_hr_path, filename), image_HR)
+                cv2.imwrite(os.path.join(self.valid_lr_path, filename), image_LR)
+                cv2.imwrite(os.path.join(self.valid_bic_path, filename), image_Bic)
 
     def copy_annotations(self):
         filepaths = [f for f in os.listdir(self.sourcedir) if f.endswith('.txt')]
+        filepaths.sort()
         num_files = len(filepaths)
         # prepare data with augementation
         for i in range(num_files):
@@ -90,9 +78,14 @@ class PrepareImage():
             print('No.{} -- Processing {}'.format(i, filename))
             
             origin_file = os.path.join(self.sourcedir, filename)
-            shutil.copy2(origin_file, self.saveHRpath)
-            shutil.copy2(origin_file, self.saveLRpath)
-            shutil.copy2(origin_file, self.saveBicpath)
+            if i < num_files * (1 - self.valid_percent):
+                shutil.copy2(origin_file, self.hr_path)
+                shutil.copy2(origin_file, self.lr_path)
+                shutil.copy2(origin_file, self.bic_path)
+            else:
+                shutil.copy2(origin_file, self.valid_hr_path)
+                shutil.copy2(origin_file, self.valid_lr_path)
+                shutil.copy2(origin_file, self.valid_bic_path)
 
 
 
