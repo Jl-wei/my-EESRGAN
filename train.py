@@ -16,6 +16,13 @@ torch.backends.cudnn.benchmark = False
 np.random.seed(SEED)
 
 def main(config):
+    utils.setup_logger('base', config['logger']['path'], 'train_' + config['name'], 
+                    level=logging.INFO,
+                    screen=True, tofile=True)
+    utils.setup_logger('val', config['logger']['path'], 'val_' + config['name'], 
+                    level=logging.INFO,
+                    screen=True, tofile=True)
+
     train_data_loader = data.COWCDataLoader(
         config["data_loader"]["train"]["HR_img_dir"],
         config["data_loader"]["train"]["LR_img_dir"],
@@ -35,7 +42,5 @@ def main(config):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-
     config = utils.read_json('./config.json')
     main(config)

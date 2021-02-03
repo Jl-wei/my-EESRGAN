@@ -12,6 +12,7 @@ dataset/*
 !dataset/README.md
 
 # saved
+saved/logs/*
 saved/pretrained_models/*
 saved/training_state/*
 

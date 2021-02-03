@@ -1,6 +1,6 @@
 import logging
 import os
-import datetime
+from datetime import datetime
 
 
 def get_timestamp():
@@ -25,3 +25,18 @@ def mkdir_and_rename(path):
         logger.info('Path already exists. Rename it to [{:s}]'.format(new_name))
         os.rename(path, new_name)
     os.makedirs(path)
+
+def setup_logger(logger_name, root, phase, level=logging.INFO, screen=False, tofile=False):
+    lg = logging.getLogger(logger_name)
+    formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(levelname)s: %(message)s',
+                                  datefmt='%y-%m-%d %H:%M:%S')
+    lg.setLevel(level)
+    if tofile:
+        log_file = os.path.join(root, phase + '_{}.log'.format(get_timestamp()))
+        fh = logging.FileHandler(log_file, mode='w')
+        fh.setFormatter(formatter)
+        lg.addHandler(fh)
+    if screen:
+        sh = logging.StreamHandler()
+        sh.setFormatter(formatter)
+        lg.addHandler(sh)

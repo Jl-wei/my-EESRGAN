@@ -6,6 +6,7 @@ import time
 
 import models
 from utils import save_img, tensor2img, mkdir
+import utils
 
 logger = logging.getLogger('base')
 
@@ -64,5 +65,5 @@ class COWCTrainer:
                     self.model.test(self.valid_data_loader)
 
         logger.info('Saving the final model.')
-        self.model.save(time.strftime("%Y%m%d%H%M%S"))
+        self.model.save(utils.get_timestamp)
         logger.info('End of training.')

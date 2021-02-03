@@ -27,7 +27,7 @@
         }
     },
     "train": {
-        "niter": 1,
+        "niter": 1000,
         "warmup_iter": -1,
         "pixel_criterion": "l1",
         "pixel_weight": 0.01,
@@ -60,7 +60,7 @@
             "LR_img_dir": "dataset/Potsdam_ISPRS/LR/x4/"
         },
         "args":{
-            "batch_size": 2,
+            "batch_size": 4,
             "shuffle": true,
             "validation_split": 0.0,
             "num_workers": 2
@@ -90,6 +90,7 @@
         "Test_Result_SR": "saved/Test_Result_SR/"
     },
     "logger": {
-        "print_freq": 100
+        "print_freq": 100,
+        "path": "saved/logs"
     }
 }
