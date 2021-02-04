@@ -26,7 +26,50 @@ class COWCTrainer:
         self.model = models.EESN_FRCNN_GAN(config, self.device)
 
     def test(self):
-        self.model.test(self.data_loader, train=False, testResult=True)
+        val_logger = logging.getLogger('valid')
+        total_psnr = 0.0
+        total_ssim = 0.0
+        for _, (image, targets) in enumerate(self.valid_data_loader):
+            self.model.feed_data(image, targets)
+            self.model.test()
+
+            visuals = self.model.get_current_visuals()
+            sr_img = tensor2img(visuals['SR'])  # uint8
+            gt_img = tensor2img(visuals['GT'])  # uint8
+
+            img_name = os.path.splitext(os.path.basename(image['LQ_path'][0]))[0]
+            # img_dir = os.path.join(self.config['path']['valid_img'], img_name)
+            # os.makedirs(img_dir, exist_ok=True)
+
+            # # Save SR images for reference
+            # save_img_path = os.path.join(img_dir, '{:s}_SR.png'.format(img_name))
+            # save_img(sr_img, save_img_path)
+            # # Save GT images for reference
+            # save_img_path = os.path.join(img_dir, '{:s}_GT.png'.format(img_name))
+            # save_img(gt_img, save_img_path)
+            # # Save final_SR images for reference
+            # save_img_path = os.path.join(img_dir, '{:s}_final_SR.png'.format(img_name))
+
+            # calculate PSNR
+            crop_size = self.config['scale']
+            gt_img = gt_img / 255.
+            sr_img = sr_img / 255.
+            cropped_sr_img = sr_img[crop_size:-crop_size, crop_size:-crop_size, :]
+            cropped_gt_img = gt_img[crop_size:-crop_size, crop_size:-crop_size, :]
+            psnr = utils.calculate_psnr(cropped_sr_img * 255, cropped_gt_img * 255)
+            ssim = utils.calculate_ssim(cropped_sr_img * 255, cropped_gt_img * 255)
+
+            val_logger.info('{:<25} # PSNR: {:.4e} # SSIM: {:.4e}'.format(img_name, psnr, ssim))
+
+            total_psnr += psnr
+            total_ssim += ssim
+
+        avg_psnr = total_psnr / self.valid_data_loader.length
+        avg_ssim = total_ssim / self.valid_data_loader.length
+
+        val_logger.info('##### Validation # PSNR: {:.4e}'.format(avg_psnr))
+        val_logger.info('##### Validation # SSIM: {:.4e}'.format(avg_ssim))
+        
 
     def train(self):
         # Training logic for an epoch
@@ -62,7 +105,7 @@ class COWCTrainer:
 
                 # validation
                 if self.do_validation and current_step % self.config['train']['val_freq'] == 0:
-                    self.model.test(self.valid_data_loader)
+                    self.test()
 
         logger.info('Saving the final model.')
         self.model.save(utils.get_timestamp)

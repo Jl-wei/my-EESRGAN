@@ -19,7 +19,7 @@ def main(config):
     utils.setup_logger('base', config['logger']['path'], 'train_' + config['name'], 
                     level=logging.INFO,
                     screen=True, tofile=True)
-    utils.setup_logger('val', config['logger']['path'], 'val_' + config['name'], 
+    utils.setup_logger('valid', config['logger']['path'], 'valid_' + config['name'], 
                     level=logging.INFO,
                     screen=True, tofile=True)
 
@@ -37,7 +37,8 @@ def main(config):
         1, training = False)
 
     trainer = trainers.COWCTrainer(config, train_data_loader, valid_data_loader)
-    trainer.train()
+    # trainer.train()
+    trainer.test()
     # import pdb; pdb.set_trace()
 
 

@@ -1,5 +1,7 @@
 {
     "name": "EESRGAN",
+    "scale": 4,
+
     "network_G": {
         "in_nc": 3,
         "out_nc": 3,
@@ -87,7 +89,8 @@
     "path": {
         "training_state": "saved/training_state",
         "output_images": "saved/val_images_cars_new",
-        "Test_Result_SR": "saved/Test_Result_SR/"
+        "Test_Result_SR": "saved/Test_Result_SR",
+        "valid_img": "saved/valid_img"
     },
     "logger": {
         "print_freq": 100,

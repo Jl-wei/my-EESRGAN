@@ -140,7 +140,6 @@ class EESN_FRCNN_GAN(GANBaseModel):
                         restarts=self.configS['args']['restarts'], weights=self.configS['args']['restart_weights']))
         else:
             raise NotImplementedError('MultiStepLR learning rate scheme is enough.')
-        print(self.configS['args']['restarts'])
 
         self.log_dict = OrderedDict()
 
@@ -148,19 +147,12 @@ class EESN_FRCNN_GAN(GANBaseModel):
         self.load()  # load G and D if needed
 
 
-    def test(self, valid_data_loader, train = True, testResult = False):
+    def test(self):
         self.netG.eval()
         self.netFRCNN.eval()
-        self.targets = valid_data_loader
-        if testResult == False:
-            with torch.no_grad():
-                self.fake_H, self.final_SR, self.x_learned_lap_fake, self.x_lap = self.netG(self.var_L)
-                self.x_lap_HR = kornia.laplacian(self.var_H, 3)
-        if train == True:
-            evaluate(self.netG, self.netFRCNN, self.targets, self.device)
-        if testResult == True:
-            evaluate(self.netG, self.netFRCNN, self.targets, self.device)
-            evaluate_save(self.netG, self.netFRCNN, self.targets, self.device, self.config)
+        with torch.no_grad():
+            self.fake_H, self.final_SR, self.x_learned_lap_fake, self.x_lap = self.netG(self.var_L)
+            _, _, _, self.x_lap_HR = self.netG(self.var_H)
         self.netG.train()
         self.netFRCNN.train()
 
