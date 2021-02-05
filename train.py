@@ -7,6 +7,9 @@ import data
 import trainers
 import utils
 
+'''
+stdbuf -oL python train.py > ./saved/logs/log
+'''
 
 # fix random seeds for reproducibility
 SEED = 111
@@ -23,6 +26,9 @@ def main(config):
                     level=logging.INFO,
                     screen=True, tofile=True)
 
+    logger = logging.getLogger('base')
+    logger.info('######################{:^20}######################'.format(config['name']))
+
     train_data_loader = data.COWCDataLoader(
         config["data_loader"]["train"]["HR_img_dir"],
         config["data_loader"]["train"]["LR_img_dir"],
@@ -37,11 +43,30 @@ def main(config):
         1, training = False)
 
     trainer = trainers.COWCTrainer(config, train_data_loader, valid_data_loader)
-    # trainer.train()
+    trainer.train()
     trainer.test()
     # import pdb; pdb.set_trace()
 
 
 if __name__ == '__main__':
     config = utils.read_json('./config.json')
+
+    config['name'] = 'pixel-001-feature-1'
+    main(config)
+
+    config['name'] = 'pixel-001-feature-10'
+    # config['train']['pixel_weight'] = 0.01
+    config['train']['feature_weight'] = 10
+    main(config)
+
+    config['name'] = 'pixel-001-feature-100'
+    config['train']['feature_weight'] = 100
+    main(config)
+
+    config['name'] = 'pixel-001-feature-1000'
+    config['train']['feature_weight'] = 1000
+    main(config)
+
+    config['name'] = 'pixel-001-feature-10000'
+    config['train']['feature_weight'] = 10000
     main(config)

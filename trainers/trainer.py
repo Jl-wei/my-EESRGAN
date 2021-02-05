@@ -7,6 +7,7 @@ import time
 import models
 from utils import save_img, tensor2img, mkdir
 import utils
+from detection.engine import evaluate
 
 logger = logging.getLogger('base')
 
@@ -29,6 +30,7 @@ class COWCTrainer:
         val_logger = logging.getLogger('valid')
         total_psnr = 0.0
         total_ssim = 0.0
+        val_logger.info('######################{:^20}######################'.format(self.config['name']))
         for _, (image, targets) in enumerate(self.valid_data_loader):
             self.model.feed_data(image, targets)
             self.model.test()
@@ -69,6 +71,15 @@ class COWCTrainer:
 
         val_logger.info('##### Validation # PSNR: {:.4e}'.format(avg_psnr))
         val_logger.info('##### Validation # SSIM: {:.4e}'.format(avg_ssim))
+
+        # Evaluate detection result
+        self.model.netG.eval()
+        self.model.netFRCNN.eval()
+        print('######################{:^20}######################'.format(self.config['name']))
+        evaluate(self.model.netG, self.model.netFRCNN, self.valid_data_loader, self.device)
+        self.model.netG.train()
+        self.model.netFRCNN.train()
+
         
 
     def train(self):
@@ -103,10 +114,11 @@ class COWCTrainer:
                         message += '{:s}: {:.4e} '.format(k, v)
                     logger.info(message)
 
-                # validation
-                if self.do_validation and current_step % self.config['train']['val_freq'] == 0:
-                    self.test()
+                # # validation
+                # if self.do_validation and current_step % self.config['train']['val_freq'] == 0:
+                #     self.test()
 
         logger.info('Saving the final model.')
-        self.model.save(utils.get_timestamp)
+        # self.model.save(utils.get_timestamp)
+        self.model.save(self.config['name'])
         logger.info('End of training.')

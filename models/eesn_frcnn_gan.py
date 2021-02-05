@@ -11,7 +11,6 @@ import models
 import models.lr_scheduler as lr_scheduler
 from models.losses import GANLoss, CharbonnierLoss
 from .gan_base_model import GANBaseModel
-from detection.engine import evaluate, evaluate_save
 
 
 logger = logging.getLogger('base')
@@ -144,7 +143,7 @@ class EESN_FRCNN_GAN(GANBaseModel):
         self.log_dict = OrderedDict()
 
         # self.print_network()  # print network
-        self.load()  # load G and D if needed
+        # self.load()  # load G and D if needed
 
 
     def test(self):
