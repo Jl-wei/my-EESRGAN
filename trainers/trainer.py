@@ -52,7 +52,7 @@ class COWCTrainer:
             # # Save final_SR images for reference
             # save_img_path = os.path.join(img_dir, '{:s}_final_SR.png'.format(img_name))
 
-            # calculate PSNR
+            # calculate PSNR and SSIM
             crop_size = self.config['scale']
             gt_img = gt_img / 255.
             sr_img = sr_img / 255.
