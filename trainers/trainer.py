@@ -40,17 +40,7 @@ class COWCTrainer:
             gt_img = tensor2img(visuals['GT'])  # uint8
 
             img_name = os.path.splitext(os.path.basename(image['LQ_path'][0]))[0]
-            # img_dir = os.path.join(self.config['path']['valid_img'], img_name)
-            # os.makedirs(img_dir, exist_ok=True)
-
-            # # Save SR images for reference
-            # save_img_path = os.path.join(img_dir, '{:s}_SR.png'.format(img_name))
-            # save_img(sr_img, save_img_path)
-            # # Save GT images for reference
-            # save_img_path = os.path.join(img_dir, '{:s}_GT.png'.format(img_name))
-            # save_img(gt_img, save_img_path)
-            # # Save final_SR images for reference
-            # save_img_path = os.path.join(img_dir, '{:s}_final_SR.png'.format(img_name))
+            # self.save_images(img_name, visuals)
 
             # calculate PSNR and SSIM
             crop_size = self.config['scale']
@@ -79,8 +69,6 @@ class COWCTrainer:
         evaluate(self.model.netG, self.model.netFRCNN, self.valid_data_loader, self.device)
         self.model.netG.train()
         self.model.netFRCNN.train()
-
-        
 
     def train(self):
         # Training logic for an epoch
@@ -122,3 +110,38 @@ class COWCTrainer:
         # self.model.save(utils.get_timestamp)
         self.model.save(self.config['name'])
         logger.info('End of training.')
+
+    def save_images(self, img_name, visuals):
+        sr_img = tensor2img(visuals['SR'])  # uint8
+        gt_img = tensor2img(visuals['GT'])  # uint8
+        lap_learned = tensor2img(visuals['lap_learned']) # uint8
+        lap = tensor2img(visuals['lap']) # uint8
+        lap_HR = tensor2img(visuals['lap_HR']) # uint8
+        final_SR = tensor2img(visuals['final_SR']) # uint8
+
+        img_dir = os.path.join(self.config['path']['valid_img'], img_name)
+        os.makedirs(img_dir, exist_ok=True)
+
+        # Save SR images for reference
+        save_img_path = os.path.join(img_dir, '{:s}_SR.png'.format(img_name))
+        save_img(sr_img, save_img_path)
+
+        # Save GT images for reference
+        save_img_path = os.path.join(img_dir, '{:s}_GT.png'.format(img_name))
+        save_img(gt_img, save_img_path)
+
+        # Save final_SR images for reference
+        save_img_path = os.path.join(img_dir, '{:s}_final_SR.png'.format(img_name))
+        save_img(final_SR, save_img_path)
+
+        # Save lap_learned images for reference
+        save_img_path = os.path.join(img_dir, '{:s}_lap_learned.png'.format(img_name))
+        save_img(lap_learned, save_img_path)
+
+        # Save lap images for reference
+        save_img_path = os.path.join(img_dir, '{:s}_lap.png'.format(img_name))
+        save_img(lap, save_img_path)
+
+        # Save lap images for reference
+        save_img_path = os.path.join(img_dir, '{:s}_lap_HR.png'.format(img_name))
+        save_img(lap_HR, save_img_path)
