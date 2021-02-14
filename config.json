@@ -29,7 +29,7 @@
         }
     },
     "train": {
-        "niter": 10,
+        "niter": 10000,
         "warmup_iter": -1,
         "pixel_criterion": "l1",
         "pixel_weight": 0.01,

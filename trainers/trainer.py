@@ -51,7 +51,7 @@ class COWCTrainer:
             psnr = utils.calculate_psnr(cropped_sr_img * 255, cropped_gt_img * 255)
             ssim = utils.calculate_ssim(cropped_sr_img * 255, cropped_gt_img * 255)
 
-            val_logger.info('{:<25} # PSNR: {:.4e} # SSIM: {:.4e}'.format(img_name, psnr, ssim))
+            # val_logger.info('{:<25} # PSNR: {:.4e} # SSIM: {:.4e}'.format(img_name, psnr, ssim))
 
             total_psnr += psnr
             total_ssim += ssim

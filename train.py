@@ -8,7 +8,7 @@ import trainers
 import utils
 
 '''
-stdbuf -oL python train.py > ./saved/logs/log
+nohup stdbuf -oL python train.py > ./saved/logs/log.log &
 '''
 
 # fix random seeds for reproducibility
@@ -19,13 +19,6 @@ torch.backends.cudnn.benchmark = False
 np.random.seed(SEED)
 
 def main(config):
-    utils.setup_logger('base', config['logger']['path'], 'train_' + config['name'], 
-                    level=logging.INFO,
-                    screen=True, tofile=True)
-    utils.setup_logger('valid', config['logger']['path'], 'valid_' + config['name'], 
-                    level=logging.INFO,
-                    screen=True, tofile=True)
-
     logger = logging.getLogger('base')
     logger.info('######################{:^20}######################'.format(config['name']))
 
@@ -45,28 +38,38 @@ def main(config):
     trainer = trainers.COWCTrainer(config, train_data_loader, valid_data_loader)
     trainer.train()
     trainer.test()
+
+    logger.info("\n\n\n")
+
     # import pdb; pdb.set_trace()
 
 
 if __name__ == '__main__':
     config = utils.read_json('./config.json')
 
-    config['name'] = 'pixel-001-feature-1'
+    utils.setup_logger('base', config['logger']['path'], 'train', 
+                    level=logging.INFO,
+                    screen=True, tofile=True)
+    utils.setup_logger('valid', config['logger']['path'], 'valid', 
+                    level=logging.INFO,
+                    screen=True, tofile=True)
+
+    config['train']['pixel_weight'] = 0.1
+    config['train']['feature_weight'] = 0.9
+    config['name'] = 'pixel-01-feature-09'
     main(config)
 
-    config['name'] = 'pixel-001-feature-10'
-    # config['train']['pixel_weight'] = 0.01
-    config['train']['feature_weight'] = 10
+    config['train']['pixel_weight'] = 0.01
+    config['train']['feature_weight'] = 0.99
+    config['name'] = 'pixel-001-feature-099'
     main(config)
 
-    config['name'] = 'pixel-001-feature-100'
-    config['train']['feature_weight'] = 100
+    config['train']['pixel_weight'] = 0.001
+    config['train']['feature_weight'] = 0.999
+    config['name'] = 'pixel-0001-feature-0999'
     main(config)
 
-    config['name'] = 'pixel-001-feature-1000'
-    config['train']['feature_weight'] = 1000
-    main(config)
-
-    config['name'] = 'pixel-001-feature-10000'
-    config['train']['feature_weight'] = 10000
+    config['train']['pixel_weight'] = 0.0001
+    config['train']['feature_weight'] = 0.9999
+    config['name'] = 'pixel-00001-feature-09999'
     main(config)
