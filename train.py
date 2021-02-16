@@ -54,22 +54,11 @@ if __name__ == '__main__':
                     level=logging.INFO,
                     screen=True, tofile=True)
 
-    config['train']['pixel_weight'] = 0.1
-    config['train']['feature_weight'] = 0.9
-    config['name'] = 'pixel-01-feature-09'
-    main(config)
+    pixel_weights = [0.9, 0.5, 0.3, 0.1, 0.01, 0.001, 0.0001]
 
-    config['train']['pixel_weight'] = 0.01
-    config['train']['feature_weight'] = 0.99
-    config['name'] = 'pixel-001-feature-099'
-    main(config)
-
-    config['train']['pixel_weight'] = 0.001
-    config['train']['feature_weight'] = 0.999
-    config['name'] = 'pixel-0001-feature-0999'
-    main(config)
-
-    config['train']['pixel_weight'] = 0.0001
-    config['train']['feature_weight'] = 0.9999
-    config['name'] = 'pixel-00001-feature-09999'
-    main(config)
+    for pixel_weight in pixel_weights:
+        feature_weight = 1 - pixel_weight
+        config['train']['pixel_weight'] = pixel_weight
+        config['train']['feature_weight'] = feature_weight
+        config['name'] = 'pixel-{}-feature-{}'.format(pixel_weight, feature_weight)
+        main(config)
