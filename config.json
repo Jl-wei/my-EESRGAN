@@ -80,11 +80,13 @@
         }
     },
     "pretrained_models": {
+        "load": false,
+        "strict_load": true,
+
         "path": "saved/pretrained_models",
         "G": "saved/pretrained_models/170000_G.pth",
         "D": "saved/pretrained_models/170000_D.pth",
-        "FRCNN": "saved/pretrained_models/170000_FRCNN.pth",
-        "strict_load": true
+        "FRCNN": "saved/pretrained_models/170000_FRCNN.pth"
     },
     "path": {
         "training_state": "saved/training_state",

@@ -143,7 +143,8 @@ class EESN_FRCNN_GAN(GANBaseModel):
         self.log_dict = OrderedDict()
 
         # self.print_network()  # print network
-        self.load()  # load G and D if needed
+        if config['pretrained_models']['load']:
+            self.load()  # load G and D if needed
 
 
     def test(self):

@@ -54,10 +54,15 @@ if __name__ == '__main__':
                     level=logging.INFO,
                     screen=True, tofile=True)
 
-    pixel_weights = [0.9, 0.5, 0.3, 0.1, 0.01, 0.001, 0.0001]
+    weights_pairs = [
+                        [1, 1],
+                        [0.1, 1],
+                        [0.01, 1], 
+                        [0.001, 1],
+                        [0.0001, 1]
+                    ]
 
-    for pixel_weight in pixel_weights:
-        feature_weight = 1 - pixel_weight
+    for pixel_weight, feature_weight in weights_pairs:
         config['train']['pixel_weight'] = pixel_weight
         config['train']['feature_weight'] = feature_weight
         config['name'] = 'pixel-{}-feature-{}'.format(pixel_weight, feature_weight)
