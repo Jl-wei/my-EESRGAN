@@ -169,51 +169,67 @@ class EESN_FRCNN_GAN(GANBaseModel):
 
 
     def optimize_parameters(self, step):
+        self.fake_H, self.final_SR, self.x_learned_lap_fake, _ = self.netG(self.var_L)
+
+        # FRCNN
+        for p in self.netG.parameters():
+            p.requires_grad = False
+        for p in self.netD.parameters():
+            p.requires_grad = False
+
+        self.intermediate_img = self.final_SR
+        img_count = self.intermediate_img.size()[0]
+        self.intermediate_img = [self.intermediate_img[i] for i in range(img_count)]
+        loss_dict = self.netFRCNN(self.intermediate_img, self.targets)
+        losses = sum(loss for loss in loss_dict.values())
+
+        self.optimizer_FRCNN.zero_grad()
+        losses.backward(retain_graph=True)
+        self.optimizer_FRCNN.step()
+
+
         # Generator
         for p in self.netG.parameters():
             p.requires_grad = True
-        for p in self.netD.parameters():
-            p.requires_grad = False
-        self.optimizer_G.zero_grad()
-        self.fake_H, self.final_SR, self.x_learned_lap_fake, _ = self.netG(self.var_L)
 
         l_g_total = 0
         if step % self.D_update_ratio == 0 and step > self.D_init_iters:
             if self.cri_pix: # pixel loss
                 l_g_pix = self.l_pix_w * self.cri_pix(self.fake_H, self.var_H)
-                l_g_total += l_g_pix
+                l_g_total = l_g_total + l_g_pix
             if self.cri_fea: # feature loss
                 real_fea = self.netF(self.var_H).detach() # don't want to backpropagate this, need proper explanation
                 fake_fea = self.netF(self.fake_H) # In netF normalize=False, check it
                 l_g_fea = self.l_fea_w * self.cri_fea(fake_fea, real_fea)
-                l_g_total += l_g_fea
+                l_g_total = l_g_total + l_g_fea
 
             pred_g_fake = self.netD(self.fake_H)
             if self.configT['gan_type'] == 'gan':
                 l_g_gan = self.l_gan_w * self.cri_gan(pred_g_fake, True)
-                l_g_total += l_g_gan
+                l_g_total = l_g_total + l_g_gan
             elif self.configT['gan_type'] == 'ragan':
                 pred_d_real = self.netD(self.var_ref).detach()
                 l_g_gan = self.l_gan_w * (
                     self.cri_gan(pred_d_real - torch.mean(pred_g_fake), False) +
                     self.cri_gan(pred_g_fake - torch.mean(pred_d_real), True)) / 2
-                l_g_total += l_g_gan
+                l_g_total = l_g_total + l_g_gan
 
             # EESN calculate loss
             self.lap_HR = kornia.laplacian(self.var_H, 3)
             if self.cri_charbonnier: # charbonnier pixel loss HR and SR
                 l_e_charbonnier = 5 * (self.cri_charbonnier(self.final_SR, self.var_H)
-                                        + self.cri_charbonnier(self.x_learned_lap_fake, self.lap_HR))#change the weight to empirically
-                l_g_total += l_e_charbonnier
+                                        + self.cri_charbonnier(self.x_learned_lap_fake, self.lap_HR)) # change the weight to empirically
+                l_g_total = l_g_total + l_e_charbonnier
 
+            self.optimizer_G.zero_grad()
             l_g_total.backward(retain_graph=True)
             self.optimizer_G.step()
+
 
         # Discriminator
         for p in self.netD.parameters():
             p.requires_grad = True
 
-        self.optimizer_D.zero_grad()
         l_d_total = 0
         pred_d_real = self.netD(self.var_ref)
         pred_d_fake = self.netD(self.fake_H.detach()) # to avoid BP to Generator
@@ -226,15 +242,11 @@ class EESN_FRCNN_GAN(GANBaseModel):
             l_d_fake = self.cri_gan(pred_d_fake - torch.mean(pred_d_real), False)
             l_d_total = (l_d_real + l_d_fake) / 2 # thinking of adding final sr d loss
 
+        self.optimizer_D.zero_grad()
         l_d_total.backward()
         self.optimizer_D.step()
 
-        # # Freeze
-        # for p in self.netG.parameters():
-        #     p.requires_grad = False
-        # for p in self.netD.parameters():
-        #     p.requires_grad = False
-        
+
         # Log
         if step % self.D_update_ratio == 0 and step > self.D_init_iters:
             if self.cri_pix:
