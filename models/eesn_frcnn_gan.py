@@ -345,7 +345,7 @@ class EESN_FRCNN_GAN(GANBaseModel):
             self.load_network(load_path_D, self.netD, self.config['pretrained_models']['strict_load'])
         load_path_FRCNN = self.config['pretrained_models']['FRCNN']
         if load_path_FRCNN:
-            logger.info('Loading model for D [{:s}] ...'.format(load_path_FRCNN))
+            logger.info('Loading model for FRCNN [{:s}] ...'.format(load_path_FRCNN))
             self.load_network(load_path_FRCNN, self.netFRCNN, self.config['pretrained_models']['strict_load'])
 
 
