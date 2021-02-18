@@ -249,18 +249,22 @@ class EESN_FRCNN_GAN(GANBaseModel):
 
 
         # Log
-        if step % self.D_update_ratio == 0 and step > self.D_init_iters:
-            if self.cri_pix:
-                self.log_dict['l_g_pix'] = l_g_pix.item()
-            if self.cri_fea:
-                self.log_dict['l_g_fea'] = l_g_fea.item()
-            self.log_dict['l_g_gan'] = l_g_gan.item()
-            self.log_dict['l_e_charbonnier'] = l_e_charbonnier.item()
+        self.log_dict['l_Generator'] = l_g_total.item()
+        self.log_dict['l_Discriminator'] = l_d_total.item()
+        self.log_dict['l_FRCNN'] = losses.item()
 
-        self.log_dict['l_d_real'] = l_d_real.item()
-        self.log_dict['l_d_fake'] = l_d_fake.item()
-        self.log_dict['D_real'] = torch.mean(pred_d_real.detach())
-        self.log_dict['D_fake'] = torch.mean(pred_d_fake.detach())
+        # if step % self.D_update_ratio == 0 and step > self.D_init_iters:
+        #     if self.cri_pix:
+        #         self.log_dict['l_g_pix'] = l_g_pix.item()
+        #     if self.cri_fea:
+        #         self.log_dict['l_g_fea'] = l_g_fea.item()
+        #     self.log_dict['l_g_gan'] = l_g_gan.item()
+        #     self.log_dict['l_e_charbonnier'] = l_e_charbonnier.item()
+
+        # self.log_dict['l_d_real'] = l_d_real.item()
+        # self.log_dict['l_d_fake'] = l_d_fake.item()
+        # self.log_dict['D_real'] = torch.mean(pred_d_real.detach())
+        # self.log_dict['D_fake'] = torch.mean(pred_d_fake.detach())
 
 
     def get_current_log(self):
