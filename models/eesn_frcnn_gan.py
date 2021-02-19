@@ -64,7 +64,11 @@ class EESN_FRCNN_GAN(GANBaseModel):
                 self.cri_pix = nn.MSELoss().to(self.device)
             else:
                 raise NotImplementedError('Loss type [{:s}] not recognized.'.format(l_pix_type))
-            self.l_pix_w = self.configT['pixel_weight']
+
+            if self.configT['learnable_weight']:
+                self.l_pix_w = torch.tensor(self.configT['pixel_weight'], requires_grad=True, device=device)
+            else:
+                self.l_pix_w = self.configT['pixel_weight']
         else:
             self.cri_pix = None
 
@@ -78,7 +82,11 @@ class EESN_FRCNN_GAN(GANBaseModel):
                 self.cri_fea = nn.MSELoss().to(self.device)
             else:
                 raise NotImplementedError('Loss type [{:s}] not recognized.'.format(l_fea_type))
-            self.l_fea_w = self.configT['feature_weight']
+
+            if self.configT['learnable_weight']:
+                self.l_fea_w = torch.tensor(self.configT['feature_weight'], requires_grad=True, device=device)
+            else:
+                self.l_fea_w = self.configT['feature_weight']
         else:
             self.cri_fea = None
 
