@@ -3,6 +3,7 @@ import torch
 import math
 import os
 import time
+from torch.utils.tensorboard import SummaryWriter
 
 import models
 from utils import save_img, tensor2img, mkdir
@@ -77,6 +78,7 @@ class COWCTrainer:
                     self.data_loader.length, self.train_size))
         logger.info('Total epochs needed: {:d} for iters {:,d}'.format(
                     self.total_epochs, self.total_iters))
+        tb_logger = SummaryWriter(log_dir='saved/tb_logger/' + self.config['name'])
 
         #### training
         current_step = 0
@@ -100,6 +102,8 @@ class COWCTrainer:
                         epoch, current_step, self.model.get_current_learning_rate())
                     for k, v in logs.items():
                         message += '{:s}: {:.4e} '.format(k, v)
+                        if self.config['logger']['tensorboard'] and 'debug' not in self.config['name']:
+                            tb_logger.add_scalar(k, v, current_step)
                     logger.info(message)
 
                 # validation

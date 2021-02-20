@@ -29,7 +29,7 @@
         }
     },
     "train": {
-        "niter": 10000,
+        "niter": 8350,
         "warmup_iter": -1,
         "pixel_criterion": "l1",
         "pixel_weight": 0.01,
@@ -99,6 +99,8 @@
     },
     "logger": {
         "print_freq": 100,
-        "path": "saved/logs"
+        "path": "saved/logs",
+
+        "tensorboard": true
     }
 }
