@@ -264,10 +264,12 @@ class EESN_FRCNN_GAN(GANBaseModel):
         # if step % self.D_update_ratio == 0 and step > self.D_init_iters:
         if self.cri_pix:
             self.log_dict['l_g_pix'] = l_g_pix.item()
-            self.log_dict['weight_pix'] = self.l_pix_w.item()
+            if self.configT['learnable_weight']:
+                self.log_dict['weight_pix'] = self.l_pix_w.item()
         if self.cri_fea:
             self.log_dict['l_g_fea'] = l_g_fea.item()
-            self.log_dict['weight_fea'] = self.l_fea_w.item()
+            if self.configT['learnable_weight']:
+                self.log_dict['weight_fea'] = self.l_fea_w.item()
         #     self.log_dict['l_g_gan'] = l_g_gan.item()
         #     self.log_dict['l_e_charbonnier'] = l_e_charbonnier.item()
 
