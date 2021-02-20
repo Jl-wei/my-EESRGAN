@@ -12,7 +12,7 @@ nohup stdbuf -oL python train.py > ./saved/logs/log.log &
 '''
 
 # fix random seeds for reproducibility
-SEED = 111
+SEED = 123
 torch.manual_seed(SEED)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
@@ -41,7 +41,6 @@ def main(config):
 
     logger.info("\n\n\n")
 
-    # import pdb; pdb.set_trace()
 
 
 if __name__ == '__main__':
@@ -54,10 +53,13 @@ if __name__ == '__main__':
                     level=logging.INFO,
                     screen=True, tofile=True)
 
+    # import pdb; pdb.set_trace()
+
     weights_pairs = [
+                        [10, 1],
                         [1, 1],
                         [0.1, 1],
-                        [0.01, 1], 
+                        [0.01, 1],
                         [0.001, 1],
                         [0.0001, 1]
                     ]

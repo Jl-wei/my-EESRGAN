@@ -107,8 +107,7 @@ class COWCTrainer:
                     self.test()
 
         logger.info('Saving the final model.')
-        # self.model.save(utils.get_timestamp)
-        self.model.save(self.config['name'])
+        self.model.save(self.config['name'] + '-' + utils.get_timestamp())
         logger.info('End of training.')
 
     def save_images(self, img_name, visuals):
