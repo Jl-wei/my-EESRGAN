@@ -17,7 +17,7 @@ class COWCTrainer:
         self.data_loader = data_loader
 
         self.valid_data_loader = valid_data_loader
-        self.do_validation = self.valid_data_loader is not None
+        self.do_validation = (self.valid_data_loader is not None) and config['train']['do_valid']
 
         n_gpu = torch.cuda.device_count()
         self.device = torch.device('cuda:0' if n_gpu > 0 else 'cpu')
@@ -102,9 +102,9 @@ class COWCTrainer:
                         message += '{:s}: {:.4e} '.format(k, v)
                     logger.info(message)
 
-                # # validation
-                # if self.do_validation and current_step % self.config['train']['val_freq'] == 0:
-                #     self.test()
+                # validation
+                if self.do_validation and current_step % self.config['train']['val_freq'] == 0:
+                    self.test()
 
         logger.info('Saving the final model.')
         # self.model.save(utils.get_timestamp)
