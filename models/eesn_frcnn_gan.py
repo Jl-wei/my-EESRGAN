@@ -181,8 +181,6 @@ class EESN_FRCNN_GAN(GANBaseModel):
         self.fake_H, self.final_SR, self.x_learned_lap_fake, _ = self.netG(self.var_L)
 
         # FRCNN
-        for p in self.netG.parameters():
-            p.requires_grad = False
         for p in self.netD.parameters():
             p.requires_grad = False
 
