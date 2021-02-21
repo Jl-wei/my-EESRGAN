@@ -15,5 +15,6 @@ dataset/*
 saved/logs/*
 saved/pretrained_models/*
 saved/training_state/*
+saved/tb_logs/*
 
 !.keep

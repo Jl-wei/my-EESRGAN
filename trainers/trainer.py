@@ -78,7 +78,7 @@ class COWCTrainer:
                     self.data_loader.length, self.train_size))
         logger.info('Total epochs needed: {:d} for iters {:,d}'.format(
                     self.total_epochs, self.total_iters))
-        tb_logger = SummaryWriter(log_dir='saved/tb_logger/' + self.config['name'])
+        tb_logger = SummaryWriter(log_dir=self.config['logger']['tb_path'] + self.config['name'])
 
         #### training
         current_step = 0

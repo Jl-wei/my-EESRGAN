@@ -101,6 +101,7 @@
         "print_freq": 100,
         "path": "saved/logs",
 
-        "tensorboard": true
+        "tensorboard": true,
+        "tb_path": "saved/tb_logs/"
     }
 }
