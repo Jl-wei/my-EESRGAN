@@ -10,7 +10,7 @@ try:
 except ImportError:
     pass
 
-class PrepareImage():
+class COWCPrepare():
     def __init__(self):
         self.up_scale = 4
         self.mod_scale = 4
@@ -91,4 +91,4 @@ class PrepareImage():
 
 
 if __name__ == "__main__":
-    PrepareImage().generate_lr_hr_bic()
+    COWCPrepare().generate_lr_hr_bic()
