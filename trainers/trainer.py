@@ -78,7 +78,7 @@ class COWCTrainer:
                     self.data_loader.length, self.train_size))
         logger.info('Total epochs needed: {:d} for iters {:,d}'.format(
                     self.total_epochs, self.total_iters))
-        tb_logger = SummaryWriter(log_dir=self.config['logger']['tb_path'] + self.config['name'])
+        tb_logger = SummaryWriter(log_dir=self.config['logger']['tb_path'] + utils.filename_with_timestamp(self.config['name']))
 
         #### training
         current_step = 0
@@ -111,7 +111,8 @@ class COWCTrainer:
                     self.test()
 
         logger.info('Saving the final model.')
-        self.model.save(self.config['name'] + '-' + utils.get_timestamp())
+        self.model.save(utils.filename_with_timestamp(self.config['name']))
+        self.model.save_training_state(self.total_epochs, self.total_iters, self.config['name'])
         logger.info('End of training.')
 
     def save_images(self, img_name, visuals):
