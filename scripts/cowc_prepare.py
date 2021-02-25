@@ -32,6 +32,10 @@ class COWCPrepare():
         self.valid_lr_path = os.path.join(self.lr_path, 'valid')
         self.valid_bic_path = os.path.join(self.bic_path, 'valid')
 
+        shutil.rmtree(self.hr_path)
+        shutil.rmtree(self.lr_path)
+        shutil.rmtree(self.bic_path)
+
         os.makedirs(self.valid_hr_path, exist_ok=True)
         os.makedirs(self.valid_lr_path, exist_ok=True)
         os.makedirs(self.valid_bic_path, exist_ok=True)
