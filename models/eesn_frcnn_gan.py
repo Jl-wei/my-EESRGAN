@@ -210,7 +210,7 @@ class EESN_FRCNN_GAN(GANBaseModel):
         if step % self.D_update_ratio == 0 and step > self.D_init_iters:
             if self.cri_pix: # pixel loss
                 if self.configT['learnable_weight']:
-                    l_g_pix = (1 / torch.square(self.l_pix_w)) * self.cri_pix(self.fake_H, self.var_H) + 2 * torch.log(self.l_pix_w)
+                    l_g_pix = (1 / torch.square(self.l_pix_w)) * self.cri_pix(self.fake_H, self.var_H) + 2 * torch.log(self.l_pix_w + 1)
                 else:
                     l_g_pix = self.l_pix_w * self.cri_pix(self.fake_H, self.var_H)
                 l_g_total = l_g_total + l_g_pix
@@ -218,7 +218,7 @@ class EESN_FRCNN_GAN(GANBaseModel):
                 real_fea = self.netF(self.var_H).detach() # don't want to backpropagate this, need proper explanation
                 fake_fea = self.netF(self.fake_H) # In netF normalize=False, check it
                 if self.configT['learnable_weight']:
-                    l_g_fea = (1 / torch.square(self.l_fea_w)) * self.cri_fea(fake_fea, real_fea) + 2 * torch.log(self.l_fea_w)
+                    l_g_fea = (1 / torch.square(self.l_fea_w)) * self.cri_fea(fake_fea, real_fea) + 2 * torch.log(self.l_fea_w + 1)
                 else:
                     l_g_fea = self.l_fea_w * self.cri_fea(fake_fea, real_fea)
                 l_g_total = l_g_total + l_g_fea
