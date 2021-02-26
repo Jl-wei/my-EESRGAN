@@ -78,12 +78,17 @@ class COWCTrainer:
                     self.data_loader.length, self.train_size))
         logger.info('Total epochs needed: {:d} for iters {:,d}'.format(
                     self.total_epochs, self.total_iters))
-        tb_logger = SummaryWriter(log_dir=self.config['logger']['tb_path'] + utils.filename_with_timestamp(self.config['name']))
+        tb_logger = SummaryWriter(log_dir=self.config['logger']['tb_path'] + self.config['name'])
 
         #### training
-        current_step = 0
-        logger.info('Start training from epoch: {:d}, iter: {:d}'.format(0, current_step))
-        for epoch in range(self.total_epochs + 1):
+        if self.config['resume_state']['load']:
+            logger.info('Resume the optimizers and schedulers for training')
+            current_epoch, current_step = self.model.resume_training_state()
+        else:
+            current_epoch, current_step = 0, 0
+
+        logger.info('Start training from epoch: {:d}, iter: {:d}'.format(current_epoch, current_step))
+        for epoch in range(current_epoch, self.total_epochs + 1):
             for _, (image, targets) in enumerate(self.data_loader):
                 current_step += 1
                 if current_step > self.total_iters:

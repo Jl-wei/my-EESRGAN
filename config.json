@@ -29,7 +29,7 @@
         }
     },
     "train": {
-        "niter": 8350,
+        "niter": 11140,
         "warmup_iter": -1,
 
         "pixel_criterion": "l1",
@@ -83,8 +83,12 @@
         "D": "saved/pretrained_models/170000_D.pth",
         "FRCNN": "saved/pretrained_models/170000_FRCNN.pth"
     },
+    "resume_state": {
+        "load": false,
+        "path": "saved/training_state",
+        "state": "saved/training_state/pixel-0.5-feature-3-learn-11140.state"
+    },
     "path": {
-        "training_state": "saved/training_state",
         "output_images": "saved/val_images_cars_new",
         "Test_Result_SR": "saved/Test_Result_SR",
         "valid_img": "saved/valid_img"

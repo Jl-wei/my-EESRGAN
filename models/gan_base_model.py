@@ -103,5 +103,19 @@ class GANBaseModel():
         for o in self.optimizers:
             state['optimizers'].append(o.state_dict())
         save_filename = '{}-{}.state'.format(filename, iter_step)
-        save_path = os.path.join(self.config['path']['training_state'], save_filename)
+        save_path = os.path.join(self.config['resume_state']['path'], save_filename)
         torch.save(state, save_path)
+
+    def resume_training_state(self):
+        resume_state = torch.load(self.config['resume_state']['state'])
+
+        '''Resume the optimizers and schedulers for training'''
+        resume_optimizers = resume_state['optimizers']
+        resume_schedulers = resume_state['schedulers']
+        assert len(resume_optimizers) == len(self.optimizers), 'Wrong lengths of optimizers'
+        assert len(resume_schedulers) == len(self.schedulers), 'Wrong lengths of schedulers'
+        for i, o in enumerate(resume_optimizers):
+            self.optimizers[i].load_state_dict(o)
+        for i, s in enumerate(resume_schedulers):
+            self.schedulers[i].load_state_dict(s)
+        return int(resume_state['epoch']), int(resume_state['iter'])
