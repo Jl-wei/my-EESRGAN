@@ -68,17 +68,20 @@ class COWCTrainer:
         self.model.netFRCNN.eval()
         print('######################{:^20}######################'.format(self.config['name']))
         evaluate(self.model.netG, self.model.netFRCNN, self.valid_data_loader, self.device)
+        print("\n\n\n")
         self.model.netG.train()
         self.model.netFRCNN.train()
 
     def train(self):
+        filename = utils.filename_with_timestamp(self.config['name'])
+
         # Training logic for an epoch
         # for visualization use the following code (use batch size = 1):
         logger.info('Number of train images: {:,d}, iters: {:,d}'.format(
                     self.data_loader.length, self.train_size))
         logger.info('Total epochs needed: {:d} for iters {:,d}'.format(
                     self.total_epochs, self.total_iters))
-        tb_logger = SummaryWriter(log_dir=self.config['logger']['tb_path'] + self.config['name'])
+        tb_logger = SummaryWriter(log_dir=self.config['logger']['tb_path'] + filename)
 
         #### training
         if self.config['resume_state']['load']:
@@ -116,8 +119,8 @@ class COWCTrainer:
                     self.test()
 
         logger.info('Saving the final model.')
-        self.model.save(utils.filename_with_timestamp(self.config['name']))
-        self.model.save_training_state(self.total_epochs, self.total_iters, self.config['name'])
+        self.model.save(filename)
+        self.model.save_training_state(self.total_epochs, self.total_iters, filename)
         logger.info('End of training.')
 
     def save_images(self, img_name, visuals):
