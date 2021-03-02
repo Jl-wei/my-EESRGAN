@@ -55,37 +55,36 @@ class EESN_FRCNN_GAN(GANBaseModel):
 
         # G CharbonnierLoss for final output SR and GT HR
         self.cri_charbonnier = CharbonnierLoss().to(device)
-        # G pixel loss
-        if self.configT['pixel_weight'] > 0.0:
-            l_pix_type = self.configT['pixel_criterion']
-            if l_pix_type == 'l1':
-                self.cri_pix = nn.L1Loss().to(self.device)
-            elif l_pix_type == 'l2':
-                self.cri_pix = nn.MSELoss().to(self.device)
-            else:
-                raise NotImplementedError('Loss type [{:s}] not recognized.'.format(l_pix_type))
 
-            if self.configT['learnable_weight']:
-                self.l_pix_w = torch.tensor(float(self.configT['pixel_weight']), requires_grad = True, device=device)
-            else:
-                self.l_pix_w = self.configT['pixel_weight']
+        # G pixel loss
+        l_pix_type = self.configT['pixel_criterion']
+        if l_pix_type == 'l1':
+            self.cri_pix = nn.L1Loss().to(self.device)
+        elif l_pix_type == 'l2':
+            self.cri_pix = nn.MSELoss().to(self.device)
+        else:
+            raise NotImplementedError('Loss type [{:s}] not recognized.'.format(l_pix_type))
+
+        if self.configT['learned_weight']:
+            self.l_pix_w = torch.tensor(float(self.configT['pixel_sigma']), requires_grad = True, device=device)
+        elif self.configT['pixel_weight'] > 0.0:
+            self.l_pix_w = self.configT['pixel_weight']
         else:
             self.cri_pix = None
 
         # G feature loss
-        if self.configT['feature_weight'] > 0.0:
-            l_fea_type = self.configT['feature_criterion']
-            if l_fea_type == 'l1':
-                self.cri_fea = nn.L1Loss().to(self.device)
-            elif l_fea_type == 'l2':
-                self.cri_fea = nn.MSELoss().to(self.device)
-            else:
-                raise NotImplementedError('Loss type [{:s}] not recognized.'.format(l_fea_type))
+        l_fea_type = self.configT['feature_criterion']
+        if l_fea_type == 'l1':
+            self.cri_fea = nn.L1Loss().to(self.device)
+        elif l_fea_type == 'l2':
+            self.cri_fea = nn.MSELoss().to(self.device)
+        else:
+            raise NotImplementedError('Loss type [{:s}] not recognized.'.format(l_fea_type))
 
-            if self.configT['learnable_weight']:
-                self.l_fea_w = torch.tensor(float(self.configT['feature_weight']), requires_grad = True, device=device)
-            else:
-                self.l_fea_w = self.configT['feature_weight']
+        if self.configT['learned_weight']:
+            self.l_fea_w = torch.tensor(float(self.configT['feature_sigma']), requires_grad = True, device=device)
+        elif self.configT['feature_weight'] > 0.0:
+            self.l_fea_w = self.configT['feature_weight']
         else:
             self.cri_fea = None
 
@@ -111,7 +110,7 @@ class EESN_FRCNN_GAN(GANBaseModel):
             if v.requires_grad:
                 optim_params.append(v)
 
-        if self.configT['learnable_weight'] and self.configT['pixel_weight'] > 0.0:
+        if self.configT['learned_weight']:
             self.optimizer_G = torch.optim.Adam([ 
                                                     {'params': optim_params},
                                                     {'params': [self.l_pix_w, self.l_fea_w], 'lr': 1e-3},
@@ -209,19 +208,21 @@ class EESN_FRCNN_GAN(GANBaseModel):
         l_g_total = 0
         if step % self.D_update_ratio == 0 and step > self.D_init_iters:
             if self.cri_pix: # pixel loss
-                if self.configT['learnable_weight']:
-                    l_g_pix = (1 / torch.square(self.l_pix_w)) * self.cri_pix(self.fake_H, self.var_H) + 2 * torch.log(self.l_pix_w + 1)
+                if self.configT['learned_weight']:
+                    l_g_pix = (1 / (2 * torch.square(self.l_pix_w))) * self.cri_pix(self.fake_H, self.var_H)
                 else:
                     l_g_pix = self.l_pix_w * self.cri_pix(self.fake_H, self.var_H)
                 l_g_total = l_g_total + l_g_pix
             if self.cri_fea: # feature loss
                 real_fea = self.netF(self.var_H).detach() # don't want to backpropagate this, need proper explanation
                 fake_fea = self.netF(self.fake_H) # In netF normalize=False, check it
-                if self.configT['learnable_weight']:
-                    l_g_fea = (1 / torch.square(self.l_fea_w)) * self.cri_fea(fake_fea, real_fea) + 2 * torch.log(self.l_fea_w + 1)
+                if self.configT['learned_weight']:
+                    l_g_fea = (1 / (2 * torch.square(self.l_fea_w))) * self.cri_fea(fake_fea, real_fea)
                 else:
                     l_g_fea = self.l_fea_w * self.cri_fea(fake_fea, real_fea)
                 l_g_total = l_g_total + l_g_fea
+            if self.configT['learned_weight'] and self.cri_pix and self.cri_fea:
+                l_g_total = l_g_total + torch.log(self.l_pix_w * self.l_fea_w)
 
             pred_g_fake = self.netD(self.fake_H)
             if self.configT['gan_type'] == 'gan':
@@ -275,12 +276,12 @@ class EESN_FRCNN_GAN(GANBaseModel):
         # if step % self.D_update_ratio == 0 and step > self.D_init_iters:
         if self.cri_pix:
             self.log_dict['l_g_pix'] = l_g_pix.item()
-            if self.configT['learnable_weight']:
-                self.log_dict['weight_pix'] = (1 / torch.square(self.l_pix_w)).item()
+            if self.configT['learned_weight']:
+                self.log_dict['weight_pix'] = (1 / (2 * torch.square(self.l_pix_w))).item()
         if self.cri_fea:
             self.log_dict['l_g_fea'] = l_g_fea.item()
-            if self.configT['learnable_weight']:
-                self.log_dict['weight_fea'] = (1 / torch.square(self.l_fea_w)).item()
+            if self.configT['learned_weight']:
+                self.log_dict['weight_fea'] = (1 / (2 * torch.square(self.l_fea_w))).item()
         #     self.log_dict['l_g_gan'] = l_g_gan.item()
         #     self.log_dict['l_e_charbonnier'] = l_e_charbonnier.item()
 
