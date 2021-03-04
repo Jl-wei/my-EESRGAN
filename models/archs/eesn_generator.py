@@ -14,11 +14,11 @@ class EESNGenerator(nn.Module):
     self.netE = EESN()
 
   def forward(self, x):
-    x_base = self.netRG(x) # add bicubic according to the implementation by author but not stated in the paper
+    x_base, intermediate_in, intermediate_out = self.netRG(x) # add bicubic according to the implementation by author but not stated in the paper
     x5, x_lap = self.netE(x_base) # EESN net
     x_sr = x5 + x_base - x_lap
 
-    return x_base, x_sr, x5, x_lap
+    return x_base, x_sr, x5, x_lap, intermediate_in, intermediate_out
 
 '''
 Create EESN from this paper: https://ieeexplore.ieee.org/document/8677274 EEGAN - Edge Enhanced GAN

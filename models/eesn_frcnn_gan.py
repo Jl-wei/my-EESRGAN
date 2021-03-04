@@ -56,6 +56,11 @@ class EESN_FRCNN_GAN(GANBaseModel):
         # G CharbonnierLoss for final output SR and GT HR
         self.cri_charbonnier = CharbonnierLoss().to(device)
 
+        # intermediate loss
+        if self.configT['intermediate_loss']:
+            self.configT['learned_weight'] = True
+            self.l_inter_w = self.configT['intermediate_weight']
+
         # G pixel loss
         l_pix_type = self.configT['pixel_criterion']
         if l_pix_type == 'l1':
@@ -165,8 +170,8 @@ class EESN_FRCNN_GAN(GANBaseModel):
         self.netG.eval()
         self.netFRCNN.eval()
         with torch.no_grad():
-            self.fake_H, self.final_SR, self.x_learned_lap_fake, self.x_lap = self.netG(self.var_L)
-            _, _, _, self.x_lap_HR = self.netG(self.var_H)
+            self.fake_H, self.final_SR, self.x_learned_lap_fake, self.x_lap, _, _ = self.netG(self.var_L)
+            _, _, _, self.x_lap_HR, _, _ = self.netG(self.var_H)
         self.netG.train()
         self.netFRCNN.train()
 
@@ -184,7 +189,7 @@ class EESN_FRCNN_GAN(GANBaseModel):
 
 
     def optimize_parameters(self, step):
-        self.fake_H, self.final_SR, self.x_learned_lap_fake, _ = self.netG(self.var_L)
+        self.fake_H, self.final_SR, self.x_learned_lap_fake, _, self.intermediate_in, self.intermediate_out = self.netG(self.var_L)
 
         # FRCNN
         for p in self.netD.parameters():
@@ -207,12 +212,15 @@ class EESN_FRCNN_GAN(GANBaseModel):
 
         l_g_total = 0
         if step % self.D_update_ratio == 0 and step > self.D_init_iters:
+            if self.configT['intermediate_loss']:
+                l_g_inter = self.l_inter_w * self.cri_pix(self.intermediate_in, self.intermediate_out)
+                l_g_total += l_g_inter
             if self.cri_pix: # pixel loss
                 if self.configT['learned_weight']:
                     l_g_pix = (1 / (2 * torch.square(self.l_pix_w))) * self.cri_pix(self.fake_H, self.var_H)
                 else:
                     l_g_pix = self.l_pix_w * self.cri_pix(self.fake_H, self.var_H)
-                l_g_total = l_g_total + l_g_pix
+                l_g_total += l_g_pix
             if self.cri_fea: # feature loss
                 real_fea = self.netF(self.var_H).detach() # don't want to backpropagate this, need proper explanation
                 fake_fea = self.netF(self.fake_H) # In netF normalize=False, check it
@@ -220,27 +228,28 @@ class EESN_FRCNN_GAN(GANBaseModel):
                     l_g_fea = (1 / (2 * torch.square(self.l_fea_w))) * self.cri_fea(fake_fea, real_fea)
                 else:
                     l_g_fea = self.l_fea_w * self.cri_fea(fake_fea, real_fea)
-                l_g_total = l_g_total + l_g_fea
+                l_g_total += l_g_fea
+
             if self.configT['learned_weight'] and self.cri_pix and self.cri_fea:
-                l_g_total = l_g_total + torch.log(self.l_pix_w * self.l_fea_w)
+                l_g_total += torch.log(self.l_pix_w * self.l_fea_w)
 
             pred_g_fake = self.netD(self.fake_H)
             if self.configT['gan_type'] == 'gan':
                 l_g_gan = self.l_gan_w * self.cri_gan(pred_g_fake, True)
-                l_g_total = l_g_total + l_g_gan
+                l_g_total += l_g_gan
             elif self.configT['gan_type'] == 'ragan':
                 pred_d_real = self.netD(self.var_ref).detach()
                 l_g_gan = self.l_gan_w * (
                     self.cri_gan(pred_d_real - torch.mean(pred_g_fake), False) +
                     self.cri_gan(pred_g_fake - torch.mean(pred_d_real), True)) / 2
-                l_g_total = l_g_total + l_g_gan
+                l_g_total += l_g_gan
 
             # EESN calculate loss
             self.lap_HR = kornia.laplacian(self.var_H, 3)
             if self.cri_charbonnier: # charbonnier pixel loss HR and SR
                 l_e_charbonnier = 5 * (self.cri_charbonnier(self.final_SR, self.var_H)
                                         + self.cri_charbonnier(self.x_learned_lap_fake, self.lap_HR)) # change the weight to empirically
-                l_g_total = l_g_total + l_e_charbonnier
+                l_g_total += l_e_charbonnier
 
             self.optimizer_G.zero_grad()
             l_g_total.backward(retain_graph=True)
@@ -274,6 +283,8 @@ class EESN_FRCNN_GAN(GANBaseModel):
         self.log_dict['l_FRCNN'] = losses.item()
 
         # if step % self.D_update_ratio == 0 and step > self.D_init_iters:
+        if self.configT['intermediate_loss']:
+            self.log_dict['l_g_inter'] = l_g_inter.item()
         if self.cri_pix:
             self.log_dict['l_g_pix'] = l_g_pix.item()
             if self.configT['learned_weight']:
