@@ -118,7 +118,7 @@ class EESN_FRCNN_GAN(GANBaseModel):
         if self.configT['learned_weight']:
             self.optimizer_G = torch.optim.Adam([ 
                                                     {'params': optim_params},
-                                                    {'params': [self.l_pix_w, self.l_fea_w], 'lr': 1e-3},
+                                                    {'params': [self.l_pix_w, self.l_fea_w], 'lr': 1e-4},
                                                 ], lr=self.configO['lr_G'],
                                                 weight_decay=wd_G,
                                                 betas=(self.configO['beta1_G'], self.configO['beta2_G']))
