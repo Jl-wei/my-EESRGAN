@@ -61,8 +61,8 @@ if __name__ == '__main__':
     # config['name'] = 'pixel-{}-feature-{}-learn'.format(config['train']['pixel_sigma'], config['train']['feature_sigma'])
     # main(config)
 
-    config['train']['pixel_sigma'] = 0.45
-    config['train']['feature_sigma'] = 1.58
+    config['train']['pixel_sigma'] = 0.44
+    config['train']['feature_sigma'] = 2.5
     config['train']['learned_weight'] = True
     config['train']['intermediate_weight'] = 1
     config['train']['intermediate_loss'] = True
