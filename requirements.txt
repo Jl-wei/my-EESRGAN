@@ -2,7 +2,7 @@ opencv_python_headless
 tqdm
 matplotlib
 albumentations
-torchvision
+torchvision==0.7
 pandas
 numpy
 pytest
