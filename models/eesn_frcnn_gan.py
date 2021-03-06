@@ -59,7 +59,10 @@ class EESN_FRCNN_GAN(GANBaseModel):
         # intermediate loss
         if self.configT['intermediate_loss']:
             self.configT['learned_weight'] = True
-            self.l_inter_w = self.configT['intermediate_weight']
+            if self.configT['intermediate_learned']:
+                self.l_inter_w = torch.tensor(float(self.configT['intermediate_sigma']), requires_grad = True, device=device)
+            else:
+                self.l_inter_w = self.configT['intermediate_weight']
 
         # G pixel loss
         l_pix_type = self.configT['pixel_criterion']
@@ -213,7 +216,10 @@ class EESN_FRCNN_GAN(GANBaseModel):
         l_g_total = 0
         if step % self.D_update_ratio == 0 and step > self.D_init_iters:
             if self.configT['intermediate_loss']:
-                l_g_inter = self.l_inter_w * self.cri_pix(self.intermediate_in, self.intermediate_out)
+                if self.configT['intermediate_learned']:
+                    l_g_inter = (1 / (2 * torch.square(self.l_inter_w))) * self.cri_pix(self.intermediate_in, self.intermediate_out)
+                else:
+                    l_g_inter = self.l_inter_w * self.cri_pix(self.intermediate_in, self.intermediate_out)
                 l_g_total += l_g_inter
             if self.cri_pix: # pixel loss
                 if self.configT['learned_weight']:
@@ -285,6 +291,8 @@ class EESN_FRCNN_GAN(GANBaseModel):
         # if step % self.D_update_ratio == 0 and step > self.D_init_iters:
         if self.configT['intermediate_loss']:
             self.log_dict['l_g_inter'] = l_g_inter.item()
+            if self.configT['intermediate_learned']:
+                self.log_dict['weight_inter'] = (1 / (2 * torch.square(self.l_inter_w))).item()
         if self.cri_pix:
             self.log_dict['l_g_pix'] = l_g_pix.item()
             if self.configT['learned_weight']:

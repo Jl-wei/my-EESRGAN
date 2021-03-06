@@ -61,27 +61,27 @@ if __name__ == '__main__':
     # config['name'] = 'pixel-{}-feature-{}-learn'.format(config['train']['pixel_sigma'], config['train']['feature_sigma'])
     # main(config)
 
-    config['train']['pixel_sigma'] = 0.44
-    config['train']['feature_sigma'] = 2.5
-    config['train']['learned_weight'] = True
-    config['train']['intermediate_weight'] = 1
-    config['train']['intermediate_loss'] = True
-    config['name'] = 'fea-pix-learn-inter-fix'
-    main(config)
+    # config['train']['pixel_sigma'] = 0.44
+    # config['train']['feature_sigma'] = 2.5
+    # config['train']['learned_weight'] = True
+    # config['train']['intermediate_weight'] = 1
+    # config['train']['intermediate_loss'] = True
+    # config['name'] = 'fea-pix-learn-inter-fix'
+    # main(config)
 
-    config['train']['intermediate_loss'] = False
+    # config['train']['intermediate_loss'] = False
 
-    # weights_pairs = [
-    #                     [10, 1],
-    #                     [1, 1],
-    #                     [0.1, 1],
-    #                     [0.01, 1],
-    #                 ]
+    weights_pairs = [
+                        [10, 1],
+                        [1, 1],
+                        [0.1, 1],
+                        [0.01, 1],
+                    ]
 
-    # for pixel_weight, feature_weight in weights_pairs:
-    #     config['train']['pixel_weight'] = pixel_weight
-    #     config['train']['feature_weight'] = feature_weight
+    for pixel_weight, feature_weight in weights_pairs:
+        config['train']['pixel_weight'] = pixel_weight
+        config['train']['feature_weight'] = feature_weight
 
-    #     config['train']['learned_weight'] = False
-    #     config['name'] = 'pixel-{}-feature-{}'.format(pixel_weight, feature_weight)
-    #     main(config)
+        config['train']['learned_weight'] = False
+        config['name'] = 'pixel-{}-feature-{}'.format(pixel_weight, feature_weight)
+        main(config)
