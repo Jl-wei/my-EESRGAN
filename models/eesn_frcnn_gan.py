@@ -118,20 +118,17 @@ class EESN_FRCNN_GAN(GANBaseModel):
             if v.requires_grad:
                 optim_params.append(v)
 
+        weight_params = []
         if self.configT['learned_weight']:
             weight_params = [self.l_pix_w, self.l_fea_w]
             if self.configT['intermediate_learned']:
                 weight_params.append(self.l_inter_w)
-            self.optimizer_G = torch.optim.Adam([ 
-                                                    {'params': optim_params},
-                                                    {'params': weight_params, 'lr': 1e-4},
-                                                ], lr=self.configO['lr_G'],
-                                                weight_decay=wd_G,
-                                                betas=(self.configO['beta1_G'], self.configO['beta2_G']))
-        else:
-            self.optimizer_G = torch.optim.Adam(optim_params, lr=self.configO['lr_G'],
-                                        weight_decay=wd_G,
-                                        betas=(self.configO['beta1_G'], self.configO['beta2_G']))
+        self.optimizer_G = torch.optim.Adam([ 
+                                                {'params': optim_params},
+                                                {'params': weight_params, 'lr': 1e-4},
+                                            ], lr=self.configO['lr_G'],
+                                            weight_decay=wd_G,
+                                            betas=(self.configO['beta1_G'], self.configO['beta2_G']))
         self.optimizers.append(self.optimizer_G)
 
         # D

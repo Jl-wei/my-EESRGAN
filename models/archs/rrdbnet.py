@@ -66,8 +66,8 @@ class RRDBNet(nn.Module):
 
     def forward(self, x):
         intermediate_in = self.conv_first(x)
-        trunk = self.trunk_conv(self.RRDB_trunk(intermediate_in))
-        fea = intermediate_out = intermediate_in + trunk
+        intermediate_out = self.trunk_conv(self.RRDB_trunk(intermediate_in))
+        fea = intermediate_in + intermediate_out
 
         fea = self.lrelu(self.upconv1(F.interpolate(fea, scale_factor=2, mode='nearest')))
         fea = self.lrelu(self.upconv2(F.interpolate(fea, scale_factor=2, mode='nearest')))
