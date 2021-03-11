@@ -5,15 +5,13 @@ import numpy as np
 import glob
 import cv2
 from torch.utils.data import Dataset
-import xml.etree.ElementTree as ET
-
 
 # Ignore warnings
 import warnings
 warnings.filterwarnings("ignore")
 
 
-class HRIPCBDataset(Dataset):
+class COWCorHRIPCBDataset(Dataset):
   def __init__(self, data_dir_gt, data_dir_lq, image_height=256, image_width=256, transform = None):
     self.data_dir_gt = data_dir_gt
     self.data_dir_lq = data_dir_lq
@@ -26,9 +24,6 @@ class HRIPCBDataset(Dataset):
     self.imgs_lq = list(sorted(glob.glob(self.data_dir_lq+"*.jpg")))
     self.annotation = list(sorted(glob.glob(self.data_dir_lq+"*.txt")))
 
-    self.labels = {'missing_hole': 1, 'mouse_bite': 2, 'open_circuit': 3,
-                    'short': 4, 'spur': 5, 'spurious_copper': 6}
-
   def __getitem__(self, idx):
     #get the paths
     img_path_gt = os.path.join(self.data_dir_gt, self.imgs_gt[idx])
@@ -38,25 +33,47 @@ class HRIPCBDataset(Dataset):
     img_lq = cv2.imread(img_path_lq,1) #read color image height*width*channel=3
     img_gt = cv2.cvtColor(img_gt, cv2.COLOR_BGR2RGB)
     img_lq = cv2.cvtColor(img_lq, cv2.COLOR_BGR2RGB)
-
-    root = ET.parse(annotation_path).getroot()
-
-    filename = root.find('filename').text
-    objects = root.findall('object')
-
+    #get the bounding box
     boxes = list()
-    defects_type = list()
+    label_type = list()
+    with open(annotation_path) as f:
+        for line in f:
+            values = (line.split())
+            if "\ufeff" in values[0]:
+                values[0] = values[0][-1]
+            obj_class = int(values[0])
+            #image without bounding box - in txt file, line starts with 0 and only contains only 0
+            if obj_class == 0:
+                boxes.append([0, 0, 1, 1])
+                labels = np.ones(len(boxes)) # all are cars
+                label_type.append(obj_class)
+                #create dictionary to access the values
+                target = {}
+                target['object'] = 0
+                target['image_lq'] = img_lq
+                target['image'] = img_gt
+                target['bboxes'] = boxes
+                target['labels'] = labels
+                target['label_type'] = label_type
+                target['image_id'] = idx
+                target['LQ_path'] = img_path_lq
+                target["area"] = 0
+                target["iscrowd"] = 0
+                break
+            else:
+                #get coordinates withing height width range
+                x = float(values[1])*self.image_width
+                y = float(values[2])*self.image_height
+                width = float(values[3])*self.image_width
+                height = float(values[4])*self.image_height
+                #creating bounding boxes that would not touch the image edges
+                x_min = 1 if x - width/2 <= 0 else int(x - width/2)
+                x_max = 255 if x + width/2 >= 256 else int(x + width/2)
+                y_min = 1 if y - height/2 <= 0 else int(y - height/2)
+                y_max = 255 if y + height/2 >= 256 else int(y + height/2)
 
-    for obj in objects:
-        defects_type.append(self.labels[obj.find('name').text])
-
-        bnbbox = obj.find('bndbox')
-        x_min = bnbbox.find('xmin').text
-        y_min = bnbbox.find('ymin').text
-        x_max = bnbbox.find('xmax').text
-        y_max = bnbbox.find('ymax').text
-        boxes.append([x_min, y_min, x_max, y_max])
-
+                boxes.append([x_min, y_min, x_max, y_max])
+                label_type.append(obj_class)
 
     if obj_class != 0:
         labels = np.ones(len(boxes)) # all are cars
@@ -70,7 +87,7 @@ class HRIPCBDataset(Dataset):
         target['image'] = img_gt
         target['bboxes'] = boxes
         target['labels'] = labels
-        target['label_car_type'] = label_car_type
+        target['label_type'] = label_type
         target['image_id'] = idx
         target['LQ_path'] = img_path_lq
         target["area"] = area
@@ -97,7 +114,7 @@ class HRIPCBDataset(Dataset):
       target['image'] = torch.from_numpy(target['image'].transpose((2, 0, 1)))
       target['boxes'] = torch.tensor(target['bboxes'], dtype=torch.float32)
       target['labels'] = torch.ones(len(target['labels']), dtype=torch.int64)
-      target['label_car_type'] = torch.tensor(target['label_car_type'], dtype=torch.int64)
+      target['label_type'] = torch.tensor(target['label_type'], dtype=torch.int64)
       target['image_id'] = torch.tensor([target['image_id']])
       target["area"] = torch.tensor(target['area'])
       target["iscrowd"] = torch.tensor(target['iscrowd'])

@@ -47,9 +47,9 @@ class COWCDataLoader(BaseDataLoader):
         self.data_dir_lq = os.path.abspath(data_dir_LQ) + '/'
 
         if training == True:
-            self.dataset = data.COWCDataset(self.data_dir_gt, self.data_dir_lq, transform=data_transforms_train)
+            self.dataset = data.COWCorHRIPCBDataset(self.data_dir_gt, self.data_dir_lq, transform=data_transforms_train)
         else:
-            self.dataset = data.COWCDataset(self.data_dir_gt, self.data_dir_lq, transform=data_transforms_test)
+            self.dataset = data.COWCorHRIPCBDataset(self.data_dir_gt, self.data_dir_lq, transform=data_transforms_test)
         self.length = len(self.dataset)
         super().__init__(self.dataset, batch_size, shuffle, validation_split, num_workers, collate_fn=collate_fn)
 

@@ -1,1 +1,1 @@
-from .cowc_dataset import *
+from .cowc_hripcb_dataset import *
