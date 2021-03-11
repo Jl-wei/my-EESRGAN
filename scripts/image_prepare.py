@@ -85,6 +85,8 @@ class ImagePrepare():
             shutil.copy2(origin_file, self.bic_path)
 
     def split_for_valid(self):
+        random.seed(123)
+
         file_names = [os.path.splitext(f)[0] for f in os.listdir(self.sourcedir) if f.endswith('.txt')]
         image_nb = len(file_names)
         valid_image_nb = int(image_nb * self.valid_percent)
