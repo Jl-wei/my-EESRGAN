@@ -12,7 +12,7 @@ from detection.engine import evaluate
 
 logger = logging.getLogger('base')
 
-class COWCTrainer:
+class Trainer:
     def __init__(self, config, data_loader, valid_data_loader=None):
         self.config = config
         self.data_loader = data_loader

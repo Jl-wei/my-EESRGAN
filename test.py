@@ -35,7 +35,7 @@ def main(config):
         config["data_loader"]["valid"]["LR_img_dir"],
         1, training = False)
 
-    trainer = trainers.COWCTrainer(config, train_data_loader, valid_data_loader)
+    trainer = trainers.Trainer(config, train_data_loader, valid_data_loader)
     trainer.test()
 
     logger.info("\n\n\n")
