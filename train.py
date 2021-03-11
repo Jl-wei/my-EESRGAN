@@ -69,19 +69,49 @@ if __name__ == '__main__':
     # config['name'] = 'fea-pix-learn-inter-fix'
     # main(config)
 
+    # config['train']['pixel_sigma'] = 0.5
+    # config['train']['feature_sigma'] = 0.5
+    # config['train']['learned_weight'] = True
+    # config['train']['intermediate_sigma'] = 0.5
+    # config['train']['intermediate_loss'] = True
+    # config['train']['intermediate_learned'] = True
+    # config['name'] = 'fea-pix-learn-inter-fix'
+    # main(config)
+
     # config['train']['intermediate_loss'] = False
 
-    weights_pairs = [
-                        [10, 1],
-                        [1, 1],
-                        [0.1, 1],
-                        [0.01, 1],
-                    ]
+    # weights_pairs = [
+    #                     [10, 1],
+    #                     [1, 1],
+    #                     [0.1, 1],
+    #                     [0.01, 1],
+    #                 ]
 
-    for pixel_weight, feature_weight in weights_pairs:
-        config['train']['pixel_weight'] = pixel_weight
-        config['train']['feature_weight'] = feature_weight
+    # for pixel_weight, feature_weight in weights_pairs:
+    #     config['train']['pixel_weight'] = pixel_weight
+    #     config['train']['feature_weight'] = feature_weight
 
-        config['train']['learned_weight'] = False
-        config['name'] = 'pixel-{}-feature-{}'.format(pixel_weight, feature_weight)
-        main(config)
+    #     config['train']['learned_weight'] = False
+    #     config['name'] = 'pixel-{}-feature-{}'.format(pixel_weight, feature_weight)
+    #     main(config)
+
+    state_name = "pixel-0.01-feature-1-210307-223340"
+    current_step = 11140
+    # config['train']['learned_weight'] = True
+    # config['train']['pixel_sigma'] = 0.435
+    # config['train']['feature_sigma'] = 2.4
+    config['train']['pixel_weight'] = 0.01
+    config['train']['feature_weight'] = 1
+
+    config['pretrained_models']['load'] = True
+    config['pretrained_models']['G'] = "saved/pretrained_models/{}_G.pth".format(state_name)
+    config['pretrained_models']['D'] = "saved/pretrained_models/{}_D.pth".format(state_name)
+    config['pretrained_models']['FRCNN'] = "saved/pretrained_models/{}_FRCNN.pth".format(state_name)
+    
+    config['resume_state']['load'] = True
+    config['resume_state']['state'] = "saved/training_state/{}-{}.state".format(state_name, current_step)
+    config['train']['niter'] = 30000
+
+    config['name'] = 'pixel-0.01-feature-1'
+
+    main(config)

@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     # import pdb; pdb.set_trace()
 
-    config['name'] = "170000"
+    config['name'] = "pixel-0.5-feature-0.5-learn-210309-200428"
     config['pretrained_models']['load'] = True
     config['pretrained_models']['G'] = "saved/pretrained_models/{}_G.pth".format(config['name'])
     config['pretrained_models']['D'] = "saved/pretrained_models/{}_D.pth".format(config['name'])
