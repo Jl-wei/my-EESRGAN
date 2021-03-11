@@ -17,4 +17,9 @@ saved/pretrained_models/*
 saved/training_state/*
 saved/tb_logs/*
 
+saved_hripcb/logs/*
+saved_hripcb/pretrained_models/*
+saved_hripcb/training_state/*
+saved_hripcb/tb_logs/*
+
 !.keep
