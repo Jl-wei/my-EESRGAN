@@ -5,10 +5,7 @@ import albumentations as A
 from .base_data_loader import BaseDataLoader
 import data
 
-class COWCDataLoader(BaseDataLoader):
-    """
-    COWC data loading using BaseDataLoader
-    """
+class HRIPCBDataLoader(BaseDataLoader):
     def __init__(self, data_dir_GT, data_dir_LQ, batch_size, shuffle=True, validation_split=0.0, num_workers=1, training=True):
         # data transformation
         # According to this link: https://discuss.pytorch.org/t/normalization-of-input-image/34814/8
@@ -19,9 +16,9 @@ class COWCDataLoader(BaseDataLoader):
         '''
         data_transforms_train = A.Compose([
             A.HorizontalFlip(),
-            A.Normalize( #mean std for potsdam dataset from COWC [Calculate also for spot6]
-                mean=[0.3442, 0.3708, 0.3476],
-                std=[0.1232, 0.1230, 0.1284]
+            A.Normalize(
+                mean=[0.0719, 0.3099, 0.0952],
+                std=[0.1360, 0.1023, 0.1081]
                 )
         ],
             additional_targets={
@@ -35,9 +32,9 @@ class COWCDataLoader(BaseDataLoader):
         )
 
         data_transforms_test = A.Compose([
-            A.Normalize( #mean std for potsdam dataset from COWC [Calculate also for spot6]
-                mean=[0.3442, 0.3708, 0.3476],
-                std=[0.1232, 0.1230, 0.1284]
+            A.Normalize(
+                mean=[0.0719, 0.3099, 0.0952],
+                std=[0.1360, 0.1023, 0.1081]
                 )],
             additional_targets={
                  'image_lq':'image'
