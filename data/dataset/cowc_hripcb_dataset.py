@@ -45,7 +45,7 @@ class COWCorHRIPCBDataset(Dataset):
             #image without bounding box - in txt file, line starts with 0 and only contains only 0
             if obj_class == 0:
                 boxes.append([0, 0, 1, 1])
-                labels = np.ones(len(boxes)) # all are cars
+                labels = np.ones(len(boxes)) # all are objects
                 label_type.append(obj_class)
                 #create dictionary to access the values
                 target = {}
@@ -76,7 +76,7 @@ class COWCorHRIPCBDataset(Dataset):
                 label_type.append(obj_class)
 
     if obj_class != 0:
-        labels = np.ones(len(boxes)) # all are cars
+        labels = np.ones(len(boxes)) # all are objects
         boxes_for_calc = torch.as_tensor(boxes, dtype=torch.int64)
         area = (boxes_for_calc[:, 3] - boxes_for_calc[:, 1]) * (boxes_for_calc[:, 2] - boxes_for_calc[:, 0])
         iscrowd = torch.zeros((len(boxes),), dtype=torch.int64)
