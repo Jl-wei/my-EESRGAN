@@ -41,7 +41,8 @@ class Trainer:
             gt_img = tensor2img(visuals['GT'])  # uint8
 
             img_name = os.path.splitext(os.path.basename(image['LQ_path'][0]))[0]
-            # self.save_images(img_name, visuals)
+            if self.config['test']['save_img']:
+                self.save_images(img_name, visuals)
 
             # calculate PSNR and SSIM
             crop_size = self.config['scale']
