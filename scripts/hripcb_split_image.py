@@ -72,12 +72,12 @@ def split_img(img_path, annot_path, dest_path):
                 with open(annot_name, 'w') as f:
                     for box in tile_boxes:
                         defects_type = box[4]
-                        x_min_p = (box[2] - j) / split_width
-                        y_min_p = (box[0] - i) / split_height
                         box_w_p = (box[3] - box[2]) / split_width
                         box_h_p = (box[1] - box[0]) / split_height
+                        x_cen_p = (box[2] - j) / split_width + 0.5 * box_w_p
+                        y_cen_p = (box[0] - i) / split_height + 0.5 * box_h_p
 
-                        f.write("{} {} {} {} {}\n".format(defects_type, x_min_p, y_min_p, box_w_p, box_h_p))
+                        f.write("{} {} {} {} {}\n".format(defects_type, x_cen_p, y_cen_p, box_w_p, box_h_p))
 
                 image_name = os.path.join(dest_path , '{}_{}.jpg'.format(filename, count))
                 split = img[i:i+split_height, j:j+split_width]
@@ -116,14 +116,14 @@ if __name__ == "__main__":
     origin_dir = 'dataset/PCB_DATASET/original/'
     split_dir = 'dataset/PCB_DATASET/splited/'
 
-    # shutil.rmtree(origin_dir, ignore_errors=True)
-    # os.mkdir(origin_dir)
-    # shutil.rmtree(split_dir, ignore_errors=True)
-    # os.mkdir(split_dir)
+    shutil.rmtree(origin_dir, ignore_errors=True)
+    os.mkdir(origin_dir)
+    shutil.rmtree(split_dir, ignore_errors=True)
+    os.mkdir(split_dir)
 
-    # copy_imgs(dataset_dir, origin_dir)
-    # copy_annotations(dataset_dir, origin_dir)
-    # split_imgs(origin_dir, split_dir)
+    copy_imgs(dataset_dir, origin_dir)
+    copy_annotations(dataset_dir, origin_dir)
+    split_imgs(origin_dir, split_dir)
 
     # Count the max line of annotion file
     max = 0
