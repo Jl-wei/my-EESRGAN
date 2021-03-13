@@ -124,6 +124,7 @@ class Trainer:
         logger.info('End of training.')
 
     def save_images(self, img_name, visuals):
+        lq_img = tensor2img(visuals['LQ'])  # uint8
         sr_img = tensor2img(visuals['SR'])  # uint8
         gt_img = tensor2img(visuals['GT'])  # uint8
         lap_learned = tensor2img(visuals['lap_learned']) # uint8
@@ -133,6 +134,10 @@ class Trainer:
 
         img_dir = os.path.join(self.config['path']['valid_img'], img_name)
         os.makedirs(img_dir, exist_ok=True)
+
+        # Save LQ images for reference
+        save_img_path = os.path.join(img_dir, '{:s}_LQ.png'.format(img_name))
+        save_img(lq_img, save_img_path)
 
         # Save SR images for reference
         save_img_path = os.path.join(img_dir, '{:s}_SR.png'.format(img_name))

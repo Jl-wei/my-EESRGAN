@@ -55,6 +55,9 @@
         "do_valid": false,
         "val_freq": 3000
     },
+    "test": {
+        "save_img": false
+    },
     "data_loader": {
         "train": {
             "HR_img_dir": "dataset/PCB_DATASET/splited/HR/x4/",
