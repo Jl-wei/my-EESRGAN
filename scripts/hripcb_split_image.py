@@ -31,11 +31,11 @@ def split_img(img_path, annot_path, dest_path):
 
     img = cv2.imread(img_path)
     img_h, img_w, _ = img.shape
-    split_width = 256
-    split_height = 256
+    split_width = 320
+    split_height = 320
 
-    X_points = start_points(img_w, split_width, 0.5)
-    Y_points = start_points(img_h, split_height, 0.5)
+    X_points = start_points(img_w, split_width, 0.4)
+    Y_points = start_points(img_h, split_height, 0.4)
 
     root = ET.parse(annot_path).getroot()
 
@@ -59,9 +59,9 @@ def split_img(img_path, annot_path, dest_path):
     count = 1
     for i in Y_points:
         for j in X_points:
+            tile_boxes = []
             for box in boxes:
                 # boxes in this tile
-                tile_boxes = []
                 if i <= box[0] and box[1] <= i+split_height and \
                     j <= box[2] and box[3] <= j+split_width:
                     tile_boxes.append(box)
@@ -81,7 +81,7 @@ def split_img(img_path, annot_path, dest_path):
 
                 image_name = os.path.join(dest_path , '{}_{}.jpg'.format(filename, count))
                 split = img[i:i+split_height, j:j+split_width]
-                # split = imresize_np(split, 0.5, True)
+                split = imresize_np(split, 0.8, True)
                 cv2.imwrite(image_name, split)    
                 count += 1
 
@@ -126,11 +126,8 @@ if __name__ == "__main__":
     split_imgs(origin_dir, split_dir)
 
     # Count the max line of annotion file
-    max = 0
     for f in os.listdir(split_dir):
         if f.endswith('.txt'):
             num_lines = sum(1 for line in open(os.path.join(split_dir, f)))
-            if num_lines > max:
-                max = num_lines
-
-    print(max)
+            if num_lines > 1:
+                print("{} lines in {}".format(num_lines, f))
