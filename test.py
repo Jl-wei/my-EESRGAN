@@ -23,18 +23,22 @@ def main(config):
     logger = logging.getLogger('valid')
     logger.info('######################{:^20}######################'.format(config['name']))
 
-    train_data_loader = data.COWCDataLoader(
+    train_data_loader = data.COWCorHRIPCBDataLoader(
         config["data_loader"]["train"]["HR_img_dir"],
         config["data_loader"]["train"]["LR_img_dir"],
         config["data_loader"]["args"]["batch_size"], 
         config["data_loader"]["args"]["shuffle"], 
         config["data_loader"]["args"]["validation_split"], 
+        config["data_loader"]["args"]["mean"], 
+        config["data_loader"]["args"]["std"], 
         config["data_loader"]["args"]["num_workers"], 
         training = True)
-    valid_data_loader = data.COWCDataLoader(
+    valid_data_loader = data.COWCorHRIPCBDataLoader(
         config["data_loader"]["valid"]["HR_img_dir"],
         config["data_loader"]["valid"]["LR_img_dir"],
-        1, training = False)
+        dataset_mean = config['data_loader']['args']['mean'],
+        dataset_std = config['data_loader']['args']['std'],
+        num_workers=1, training = False)
 
     trainer = trainers.Trainer(config, train_data_loader, valid_data_loader)
     trainer.test()

@@ -5,7 +5,7 @@ import albumentations as A
 from .base_data_loader import BaseDataLoader
 import data
 
-class HRIPCBDataLoader(BaseDataLoader):
+class COWCorHRIPCBDataLoader(BaseDataLoader):
     def __init__(self, data_dir_GT, data_dir_LQ, batch_size, shuffle=True, validation_split=0.0, num_workers=1,
                 dataset_mean=[0.5, 0.5, 0.5], dataset_std=[0.5, 0.5, 0.5], training=True):
         # data transformation

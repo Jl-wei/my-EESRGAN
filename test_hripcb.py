@@ -24,7 +24,7 @@ def main(config):
     logger = logging.getLogger('valid')
     logger.info('######################{:^20}######################'.format(config['name']))
 
-    train_data_loader = data.HRIPCBDataLoader(
+    train_data_loader = data.COWCorHRIPCBDataLoader(
         config["data_loader"]["train"]["HR_img_dir"],
         config["data_loader"]["train"]["LR_img_dir"],
         config["data_loader"]["args"]["batch_size"], 
@@ -34,7 +34,7 @@ def main(config):
         config["data_loader"]["args"]["std"], 
         config["data_loader"]["args"]["num_workers"], 
         training = True)
-    valid_data_loader = data.HRIPCBDataLoader(
+    valid_data_loader = data.COWCorHRIPCBDataLoader(
         config["data_loader"]["valid"]["HR_img_dir"],
         config["data_loader"]["valid"]["LR_img_dir"],
         dataset_mean = config['data_loader']['args']['mean'],
