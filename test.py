@@ -29,16 +29,16 @@ def main(config):
         config["data_loader"]["args"]["batch_size"], 
         config["data_loader"]["args"]["shuffle"], 
         config["data_loader"]["args"]["validation_split"], 
+        config["data_loader"]["args"]["num_workers"], 
         config["data_loader"]["args"]["mean"], 
         config["data_loader"]["args"]["std"], 
-        config["data_loader"]["args"]["num_workers"], 
         training = True)
     valid_data_loader = data.COWCorHRIPCBDataLoader(
         config["data_loader"]["valid"]["HR_img_dir"],
         config["data_loader"]["valid"]["LR_img_dir"],
         dataset_mean = config['data_loader']['args']['mean'],
         dataset_std = config['data_loader']['args']['std'],
-        num_workers=1, training = False)
+        batch_size=1, training = False)
 
     trainer = trainers.Trainer(config, train_data_loader, valid_data_loader)
     trainer.test()
