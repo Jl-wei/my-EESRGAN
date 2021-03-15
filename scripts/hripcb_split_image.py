@@ -31,8 +31,8 @@ def split_img(img_path, annot_path, dest_path):
 
     img = cv2.imread(img_path)
     img_h, img_w, _ = img.shape
-    split_width = 320
-    split_height = 320
+    split_width = 256
+    split_height = 256
 
     X_points = start_points(img_w, split_width, 0.4)
     Y_points = start_points(img_h, split_height, 0.4)
@@ -81,7 +81,7 @@ def split_img(img_path, annot_path, dest_path):
 
                 image_name = os.path.join(dest_path , '{}_{}.jpg'.format(filename, count))
                 split = img[i:i+split_height, j:j+split_width]
-                split = imresize_np(split, 0.8, True)
+                # split = imresize_np(split, 0.8, True)
                 cv2.imwrite(image_name, split)    
                 count += 1
 
