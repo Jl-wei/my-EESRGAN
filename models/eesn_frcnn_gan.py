@@ -97,7 +97,11 @@ class EESN_FRCNN_GAN(GANBaseModel):
             self.cri_fea = None
 
         if self.cri_fea:  # load VGG perceptual loss
-            self.netF = models.VGGFeatureExtractor(feature_layer=34, use_input_norm=True, device=self.device)
+            self.netF = models.VGGFeatureExtractor(feature_layer = 34, 
+                                                use_input_norm = True, 
+                                                device = self.device,
+                                                dataset_mean = self.config['data_loader']['args']['mean'],
+                                                dataset_std = self.config['data_loader']['args']['std'])
             self.netF = self.netF.to(self.device)
             self.netF = DataParallel(self.netF)
             self.netF.eval()

@@ -28,12 +28,16 @@ def main(config):
         config["data_loader"]["args"]["batch_size"], 
         config["data_loader"]["args"]["shuffle"], 
         config["data_loader"]["args"]["validation_split"], 
+        config["data_loader"]["args"]["mean"], 
+        config["data_loader"]["args"]["std"], 
         config["data_loader"]["args"]["num_workers"], 
         training = True)
     valid_data_loader = data.HRIPCBDataLoader(
         config["data_loader"]["valid"]["HR_img_dir"],
         config["data_loader"]["valid"]["LR_img_dir"],
-        1, training = False)
+        dataset_mean = config['data_loader']['args']['mean'],
+        dataset_std = config['data_loader']['args']['std'],
+        num_workers=1, training = False)
 
     trainer = trainers.Trainer(config, train_data_loader, valid_data_loader)
     trainer.train()
@@ -55,9 +59,9 @@ if __name__ == '__main__':
 
     weights_pairs = [
                         [0.01, 1],
-                        [0.1, 1],
-                        [1, 1],
-                        [10, 1],
+                        # [0.1, 1],
+                        # [1, 1],
+                        # [10, 1],
                     ]
 
     for pixel_weight, feature_weight in weights_pairs:
@@ -67,3 +71,9 @@ if __name__ == '__main__':
         config['train']['learned_weight'] = False
         config['name'] = 'pixel-{}-feature-{}'.format(pixel_weight, feature_weight)
         main(config)
+
+    # config['train']['pixel_sigma'] = 0.5
+    # config['train']['feature_sigma'] = 0.5
+    # config['train']['learned_weight'] = True
+    # config['name'] = 'pixel-{}-feature-{}-learn'.format(config['train']['pixel_sigma'], config['train']['feature_sigma'])
+    # main(config)

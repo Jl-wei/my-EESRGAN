@@ -71,7 +71,9 @@
             "batch_size": 3,
             "shuffle": true,
             "validation_split": 0.0,
-            "num_workers": 2
+            "num_workers": 2,
+            "mean": [0.0833, 0.3370, 0.1127],
+            "std": [0.1457, 0.1078, 0.1721]
         }
     },
     "lr_scheduler": {

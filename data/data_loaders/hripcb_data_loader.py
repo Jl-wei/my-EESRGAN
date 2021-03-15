@@ -6,7 +6,8 @@ from .base_data_loader import BaseDataLoader
 import data
 
 class HRIPCBDataLoader(BaseDataLoader):
-    def __init__(self, data_dir_GT, data_dir_LQ, batch_size, shuffle=True, validation_split=0.0, num_workers=1, training=True):
+    def __init__(self, data_dir_GT, data_dir_LQ, batch_size, shuffle=True, validation_split=0.0, num_workers=1,
+                dataset_mean=[0.5, 0.5, 0.5], dataset_std=[0.5, 0.5, 0.5], training=True):
         # data transformation
         # According to this link: https://discuss.pytorch.org/t/normalization-of-input-image/34814/8
         # satellite image 0.5 is good otherwise calculate mean and std for the whole dataset.
@@ -17,8 +18,8 @@ class HRIPCBDataLoader(BaseDataLoader):
         data_transforms_train = A.Compose([
             A.HorizontalFlip(),
             A.Normalize(
-                mean=[0.0719, 0.3099, 0.0952],
-                std=[0.1360, 0.1023, 0.1081]
+                mean=dataset_mean,
+                std=dataset_std
                 )
         ],
             additional_targets={
@@ -33,8 +34,8 @@ class HRIPCBDataLoader(BaseDataLoader):
 
         data_transforms_test = A.Compose([
             A.Normalize(
-                mean=[0.0719, 0.3099, 0.0952],
-                std=[0.1360, 0.1023, 0.1081]
+                mean=dataset_mean,
+                std=dataset_std
                 )],
             additional_targets={
                  'image_lq':'image'

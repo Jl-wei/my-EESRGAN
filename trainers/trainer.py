@@ -37,8 +37,12 @@ class Trainer:
             self.model.test()
 
             visuals = self.model.get_current_visuals()
-            sr_img = tensor2img(visuals['SR'])  # uint8
-            gt_img = tensor2img(visuals['GT'])  # uint8
+            sr_img = tensor2img(visuals['SR'],
+                                dataset_mean = self.config['data_loader']['args']['mean'],
+                                dataset_std = self.config['data_loader']['args']['std'])  # uint8
+            gt_img = tensor2img(visuals['GT'],
+                                dataset_mean = self.config['data_loader']['args']['mean'],
+                                dataset_std = self.config['data_loader']['args']['std'])  # uint8
 
             img_name = os.path.splitext(os.path.basename(image['LQ_path'][0]))[0]
             if self.config['test']['save_img']:
@@ -125,13 +129,27 @@ class Trainer:
         logger.info('End of training.')
 
     def save_images(self, img_name, visuals):
-        lq_img = tensor2img(visuals['LQ'])  # uint8
-        sr_img = tensor2img(visuals['SR'])  # uint8
-        gt_img = tensor2img(visuals['GT'])  # uint8
-        lap_learned = tensor2img(visuals['lap_learned']) # uint8
-        lap = tensor2img(visuals['lap']) # uint8
-        lap_HR = tensor2img(visuals['lap_HR']) # uint8
-        final_SR = tensor2img(visuals['final_SR']) # uint8
+        lq_img = tensor2img(visuals['LQ'],
+                            dataset_mean = self.config['data_loader']['args']['mean'],
+                            dataset_std = self.config['data_loader']['args']['std'])  # uint8
+        sr_img = tensor2img(visuals['SR'],
+                            dataset_mean = self.config['data_loader']['args']['mean'],
+                            dataset_std = self.config['data_loader']['args']['std'])  # uint8
+        gt_img = tensor2img(visuals['GT'],
+                            dataset_mean = self.config['data_loader']['args']['mean'],
+                            dataset_std = self.config['data_loader']['args']['std'])  # uint8
+        lap_learned = tensor2img(visuals['lap_learned'],
+                            dataset_mean = self.config['data_loader']['args']['mean'],
+                            dataset_std = self.config['data_loader']['args']['std']) # uint8
+        lap = tensor2img(visuals['lap'],
+                            dataset_mean = self.config['data_loader']['args']['mean'],
+                            dataset_std = self.config['data_loader']['args']['std']) # uint8
+        lap_HR = tensor2img(visuals['lap_HR'],
+                            dataset_mean = self.config['data_loader']['args']['mean'],
+                            dataset_std = self.config['data_loader']['args']['std']) # uint8
+        final_SR = tensor2img(visuals['final_SR'],
+                            dataset_mean = self.config['data_loader']['args']['mean'],
+                            dataset_std = self.config['data_loader']['args']['std']) # uint8
 
         img_dir = os.path.join(self.config['path']['valid_img'], img_name)
         os.makedirs(img_dir, exist_ok=True)

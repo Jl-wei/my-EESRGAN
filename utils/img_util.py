@@ -156,7 +156,8 @@ def imresize_np(img, scale, antialiasing=True):
 ####################
 
 
-def tensor2img(tensor, out_type=np.uint8, min_max=(0, 1)):
+def tensor2img(tensor, out_type=np.uint8, min_max=(0, 1), 
+                dataset_mean=[0.5, 0.5, 0.5], dataset_std=[0.5, 0.5, 0.5]):
     '''
     Converts a torch Tensor into an image Numpy array
     Input: 4D(B,(3/1),H,W), 3D(C,H,W), or 2D(H,W), any range, RGB channel order
@@ -171,8 +172,8 @@ def tensor2img(tensor, out_type=np.uint8, min_max=(0, 1)):
         img_np = np.transpose(img_np[[2, 1, 0], :, :], (1, 2, 0))  # HWC, BGR
     elif n_dim == 3: # Now only works for dimension 3
         img_np = tensor.squeeze().cpu().numpy().transpose(1,2,0).copy()
-        mean = np.array([0.3442, 0.3708, 0.3476])
-        std = np.array([0.1232, 0.1230, 0.1284])
+        mean = np.array(dataset_mean)
+        std = np.array(dataset_std)
         img_np = std * img_np + mean
         img_np = np.clip(img_np, 0, 1)
 
