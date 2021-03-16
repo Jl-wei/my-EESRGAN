@@ -74,11 +74,13 @@ class Trainer:
         val_logger.info('##### Validation # PSNR: {:.4e}'.format(avg_psnr))
         val_logger.info('##### Validation # SSIM: {:.4e}'.format(avg_ssim))
 
-    def test_frcnn(self):
+    def test_frcnn(self, current_step = 0):
         # Evaluate detection result
         self.model.netG.eval()
         self.model.netFRCNN.eval()
         print('######################{:^20}######################'.format(self.config['name']))
+        if current_step != 0:
+            print('###################### Iter {:^20}######################'.format(current_step))
         evaluate(self.model.netG, self.model.netFRCNN, self.valid_data_loader, self.device)
         print("\n\n\n")
         self.model.netG.train()
@@ -128,7 +130,7 @@ class Trainer:
 
                 # validation
                 if self.do_validation and current_step % self.config['train']['val_freq'] == 0:
-                    self.test_frcnn()
+                    self.test_frcnn(current_step)
 
         logger.info('Saving the final model.')
         self.model.save(filename)

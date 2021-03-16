@@ -8,7 +8,7 @@ import trainers
 import utils
 
 '''
-nohup stdbuf -oL python train.py > ./saved/logs/log.log &
+nohup stdbuf -o0 python train.py > ./saved/logs/log.log &
 '''
 
 # fix random seeds for reproducibility

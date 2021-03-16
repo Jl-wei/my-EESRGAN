@@ -9,7 +9,7 @@ import trainers
 import utils
 
 '''
-nohup stdbuf -oL python train_hripcb.py > ./saved_hripcb/logs/log.log &
+nohup stdbuf -o0 python train_hripcb.py > ./saved_hripcb/logs/log.log &
 '''
 
 # fix random seeds for reproducibility
@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
     utils.setup_logger('base', config['logger']['path'], 'train', 
                     level=logging.INFO,
-                    screen=True, tofile=True)
+                    screen=False, tofile=True)
     utils.setup_logger('valid', config['logger']['path'], 'valid', 
                     level=logging.INFO,
                     screen=True, tofile=True)
