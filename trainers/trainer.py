@@ -127,6 +127,7 @@ class Trainer:
                         if self.config['logger']['tensorboard'] and 'debug' not in self.config['name']:
                             tb_logger.add_scalar(k, v, current_step)
                     logger.info(message)
+                    print(message)
 
                 # validation
                 if self.do_validation and current_step % self.config['train']['val_freq'] == 0:

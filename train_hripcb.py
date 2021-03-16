@@ -56,7 +56,7 @@ if __name__ == '__main__':
                     screen=False, tofile=True)
     utils.setup_logger('valid', config['logger']['path'], 'valid', 
                     level=logging.INFO,
-                    screen=True, tofile=True)
+                    screen=False, tofile=True)
 
     config['train']['niter'] = 30000
 
