@@ -102,7 +102,7 @@ class Trainer:
             logger.info('Resume the optimizers and schedulers for training')
             current_epoch, current_step = self.model.resume_training_state()
         else:
-            current_epoch, current_step = 0, 0
+            current_epoch, current_step = 1, 0
 
         logger.info('Start training from epoch: {:d}, iter: {:d}'.format(current_epoch, current_step))
         for epoch in range(current_epoch, self.total_epochs + 1):
