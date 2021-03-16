@@ -56,7 +56,9 @@
         "val_freq": 3000
     },
     "test": {
-        "save_img": false
+        "save_img": false,
+        "test_frcnn": true,
+        "test_similarity": true
     },
     "data_loader": {
         "train": {

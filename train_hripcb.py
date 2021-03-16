@@ -2,6 +2,7 @@ import torch
 import numpy as np
 import sys
 import logging
+import os
 
 import data
 import trainers
@@ -37,7 +38,7 @@ def main(config):
         config["data_loader"]["valid"]["LR_img_dir"],
         dataset_mean = config['data_loader']['args']['mean'],
         dataset_std = config['data_loader']['args']['std'],
-        batch_size=1, training = False)
+        batch_size = 3, training = False)
 
     trainer = trainers.Trainer(config, train_data_loader, valid_data_loader)
     trainer.train()
@@ -56,6 +57,8 @@ if __name__ == '__main__':
     utils.setup_logger('valid', config['logger']['path'], 'valid', 
                     level=logging.INFO,
                     screen=True, tofile=True)
+
+    config['train']['niter'] = 30000
 
     weights_pairs = [
                         [0.01, 1],
@@ -76,4 +79,20 @@ if __name__ == '__main__':
     # config['train']['feature_sigma'] = 0.5
     # config['train']['learned_weight'] = True
     # config['name'] = 'pixel-{}-feature-{}-learn'.format(config['train']['pixel_sigma'], config['train']['feature_sigma'])
+    # main(config)
+
+    # config['name'] = "pixel-0.01-feature-1-210315-100912"
+    # current_step = 10000
+    # config['train']['pixel_weight'] = 0.01
+    # config['train']['feature_weight'] = 1
+
+    # config['pretrained_models']['load'] = True
+    # config['pretrained_models']['G'] = os.path.join(config['pretrained_models']['path'], "{}_G.pth".format(config['name']))
+    # config['pretrained_models']['D'] = os.path.join(config['pretrained_models']['path'], "{}_D.pth".format(config['name']))
+    # config['pretrained_models']['FRCNN'] = os.path.join(config['pretrained_models']['path'], "{}_FRCNN.pth".format(config['name']))
+
+    # config['resume_state']['load'] = True
+    # config['resume_state']['state'] = os.path.join(config['resume_state']['path'], "{}-{}.state".format(config['name'], current_step))
+    # config['train']['niter'] = 25000
+
     # main(config)

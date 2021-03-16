@@ -52,11 +52,13 @@
         "D_init_iters": 0,
         "manual_seed": 10,
 
-        "do_valid": false,
+        "do_valid": true,
         "val_freq": 3000
     },
     "test": {
-        "save_img": false
+        "save_img": false,
+        "test_frcnn": true,
+        "test_similarity": false
     },
     "data_loader": {
         "train": {

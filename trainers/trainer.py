@@ -28,6 +28,12 @@ class Trainer:
         self.model = models.EESN_FRCNN_GAN(config, self.device)
 
     def test(self):
+        if self.config['test']['test_similarity']:
+            self.test_similarity()
+        if self.config['test']['test_frcnn']:
+            self.test_frcnn()
+
+    def test_similarity(self):
         val_logger = logging.getLogger('valid')
         total_psnr = 0.0
         total_ssim = 0.0
@@ -68,6 +74,7 @@ class Trainer:
         val_logger.info('##### Validation # PSNR: {:.4e}'.format(avg_psnr))
         val_logger.info('##### Validation # SSIM: {:.4e}'.format(avg_ssim))
 
+    def test_frcnn(self):
         # Evaluate detection result
         self.model.netG.eval()
         self.model.netFRCNN.eval()
@@ -121,7 +128,7 @@ class Trainer:
 
                 # validation
                 if self.do_validation and current_step % self.config['train']['val_freq'] == 0:
-                    self.test()
+                    self.test_frcnn()
 
         logger.info('Saving the final model.')
         self.model.save(filename)
