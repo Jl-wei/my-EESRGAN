@@ -110,6 +110,44 @@ def split_imgs(origin_dir, split_dir):
         annot_path = os.path.join(origin_dir, filename) + '.xml'
         split_img(img_path, annot_path, split_dir)
 
+def count_labels_xml(dir):
+    labels_count = {'missing_hole': 0, 'mouse_bite': 0, 'open_circuit': 0,
+                    'short': 0, 'spur': 0, 'spurious_copper': 0}
+    for f in os.listdir(dir):
+        if f.endswith('.xml'):
+            root = ET.parse(os.path.join(dir, f)).getroot()
+            objects = root.findall('object')
+
+            # Get annotation
+            for obj in objects:
+                defects_type = obj.find('name').text
+                labels_count[defects_type] += 1
+
+    print(labels_count)
+
+def count_labels_txt(dir):
+    labels_count = {'missing_hole': 0, 'mouse_bite': 0, 'open_circuit': 0,
+                    'short': 0, 'spur': 0, 'spurious_copper': 0}
+    for f in os.listdir(dir):
+        if f.endswith('.txt'):
+            with open(os.path.join(dir, f)) as txt:
+                for line in txt:
+                    values = (line.split())
+                    if values[0] == '1':
+                        labels_count['missing_hole'] += 1
+                    elif values[0] == '2':
+                        labels_count['mouse_bite'] += 1
+                    elif values[0] == '3':
+                        labels_count['open_circuit'] += 1
+                    elif values[0] == '4':
+                        labels_count['short'] += 1
+                    elif values[0] == '5':
+                        labels_count['spur'] += 1
+                    elif values[0] == '6':
+                        labels_count['spurious_copper'] += 1
+
+    print(labels_count)
+
 
 if __name__ == "__main__":
     dataset_dir = 'dataset/PCB_DATASET'
@@ -125,9 +163,13 @@ if __name__ == "__main__":
     copy_annotations(dataset_dir, origin_dir)
     split_imgs(origin_dir, split_dir)
 
-    # Count the max line of annotion file
-    for f in os.listdir(split_dir):
-        if f.endswith('.txt'):
-            num_lines = sum(1 for line in open(os.path.join(split_dir, f)))
-            if num_lines > 1:
-                print("{} lines in {}".format(num_lines, f))
+    print('original')
+    count_labels_xml(origin_dir)
+    print('splited')
+    count_labels_txt(split_dir)
+
+    if os.path.isdir(origin_dir + 'HR/x4/'):
+        print('train')
+        count_labels_xml(origin_dir + 'HR/x4/')
+        print('valid')
+        count_labels_txt(split_dir + 'HR/x4/valid/')
