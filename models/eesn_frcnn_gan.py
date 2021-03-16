@@ -396,7 +396,12 @@ class EESN_FRCNN_GAN(GANBaseModel):
             self.load_network(load_path_FRCNN, self.netFRCNN, self.config['pretrained_models']['strict_load'])
 
 
-    def save(self, iter_step):
-        self.save_network(self.netG, 'G', iter_step)
-        self.save_network(self.netD, 'D', iter_step)
-        self.save_network(self.netFRCNN, 'FRCNN', iter_step)
+    def save(self, model_name, iter_step = 0):
+        if iter_step == 0:
+            name = model_name
+        else:
+            name = "{}-{}".format(model_name, iter_step)
+
+        self.save_network(self.netG, 'G', name)
+        self.save_network(self.netD, 'D', name)
+        self.save_network(self.netFRCNN, 'FRCNN', name)

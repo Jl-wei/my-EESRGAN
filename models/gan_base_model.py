@@ -73,8 +73,8 @@ class GANBaseModel():
         n = sum(map(lambda x: x.numel(), network.parameters()))
         return s, n
 
-    def save_network(self, network, network_label, iter_label):
-        save_filename = '{}_{}.pth'.format(iter_label, network_label)
+    def save_network(self, network, network_label, name_label):
+        save_filename = '{}_{}.pth'.format(name_label, network_label)
         save_path = os.path.join(self.config['pretrained_models']['path'], save_filename)
         if isinstance(network, nn.DataParallel) or isinstance(network, DistributedDataParallel):
             network = network.module

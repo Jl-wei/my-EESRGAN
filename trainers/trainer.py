@@ -131,9 +131,11 @@ class Trainer:
                 # validation
                 if self.do_validation and current_step % self.config['train']['val_freq'] == 0:
                     self.test_frcnn(current_step)
+                    self.model.save(filename, current_step)
+                    self.model.save_training_state(epoch, current_step, filename)
 
         logger.info('Saving the final model.')
-        self.model.save(filename)
+        self.model.save(filename, self.total_iters)
         self.model.save_training_state(self.total_epochs, self.total_iters, filename)
         logger.info('End of training.')
 
