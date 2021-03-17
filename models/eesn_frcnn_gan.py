@@ -43,7 +43,7 @@ class EESN_FRCNN_GAN(GANBaseModel):
 
         # FRCNN
         self.netFRCNN = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
-        num_classes = 2 # object and background
+        num_classes = self.config['detector']['num_classes'] # object and background
         in_features = self.netFRCNN.roi_heads.box_predictor.cls_score.in_features
         self.netFRCNN.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
         self.netFRCNN.to(self.device)
