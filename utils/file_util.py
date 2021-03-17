@@ -2,8 +2,11 @@ import logging
 import os
 from datetime import datetime
 
-def filename_with_timestamp(filename):
-    return filename + '-' + datetime.now().strftime('%y%m%d-%H%M%S')
+def filename_with_timestamp(filename, resume = False):
+    if resume:
+        return filename
+    else:
+        return filename + '-' + datetime.now().strftime('%y%m%d-%H%M%S')
 
 def get_timestamp():
     return datetime.now().strftime('%y%m%d-%H%M%S')

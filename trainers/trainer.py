@@ -87,7 +87,7 @@ class Trainer:
         self.model.netFRCNN.train()
 
     def train(self):
-        filename = utils.filename_with_timestamp(self.config['name'])
+        filename = utils.filename_with_timestamp(self.config['name'], self.config['resume_state']['load'])
 
         # Training logic for an epoch
         # for visualization use the following code (use batch size = 1):
