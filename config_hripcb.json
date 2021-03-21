@@ -61,7 +61,7 @@
     "test": {
         "save_img": false,
         "test_frcnn": true,
-        "test_similarity": false
+        "test_similarity": true
     },
     "data_loader": {
         "train": {
