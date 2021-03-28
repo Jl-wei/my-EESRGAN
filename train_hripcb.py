@@ -60,20 +60,20 @@ if __name__ == '__main__':
 
     config['train']['niter'] = 30000
 
-    weights_pairs = [
-                        # [0.01, 1],
-                        [0.1, 1],
-                        [1, 1],
-                        [10, 1],
-                    ]
+    # weights_pairs = [
+    #                     [0.01, 1],
+    #                     [0.1, 1],
+    #                     [1, 1],
+    #                     [10, 1],
+    #                 ]
 
-    for pixel_weight, feature_weight in weights_pairs:
-        config['train']['pixel_weight'] = pixel_weight
-        config['train']['feature_weight'] = feature_weight
+    # for pixel_weight, feature_weight in weights_pairs:
+    #     config['train']['pixel_weight'] = pixel_weight
+    #     config['train']['feature_weight'] = feature_weight
 
-        config['train']['learned_weight'] = False
-        config['name'] = '7cls-pixel-{}-feature-{}'.format(pixel_weight, feature_weight)
-        main(config)
+    #     config['train']['learned_weight'] = False
+    #     config['name'] = '7cls-pixel-{}-feature-{}'.format(pixel_weight, feature_weight)
+    #     main(config)
 
     # config['train']['pixel_sigma'] = 0.5
     # config['train']['feature_sigma'] = 0.5
@@ -96,3 +96,20 @@ if __name__ == '__main__':
     # config['train']['niter'] = 30000
 
     # main(config)
+
+    config['train']['pixel_sigma'] = 0.5
+    config['train']['feature_sigma'] = 0.5
+    config['train']['learned_weight'] = True
+    config['train']['intermediate_weight'] = 1
+    config['train']['intermediate_loss'] = True
+    config['name'] = 'fea-pix-learn-inter-fix'
+    main(config)
+
+    config['train']['pixel_sigma'] = 0.5
+    config['train']['feature_sigma'] = 0.5
+    config['train']['learned_weight'] = True
+    config['train']['intermediate_sigma'] = 0.5
+    config['train']['intermediate_loss'] = True
+    config['train']['intermediate_learned'] = True
+    config['name'] = 'fea-pix-learn-inter-learn'
+    main(config)

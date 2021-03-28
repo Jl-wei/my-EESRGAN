@@ -40,7 +40,7 @@ def main(config):
         config["data_loader"]["valid"]["LR_img_dir"],
         dataset_mean = config['data_loader']['args']['mean'],
         dataset_std = config['data_loader']['args']['std'],
-        batch_size = 3, training = False)
+        batch_size = 1, training = False)
 
     trainer = trainers.Trainer(config, train_data_loader, valid_data_loader)
     trainer.test()

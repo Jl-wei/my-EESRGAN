@@ -63,7 +63,7 @@ class Trainer:
             psnr = utils.calculate_psnr(cropped_sr_img * 255, cropped_gt_img * 255)
             ssim = utils.calculate_ssim(cropped_sr_img * 255, cropped_gt_img * 255)
 
-            val_logger.info('{:<25} # PSNR: {:.4e} # SSIM: {:.4e}'.format(img_name, psnr, ssim))
+            # val_logger.info('{:<25} # PSNR: {:.4e} # SSIM: {:.4e}'.format(img_name, psnr, ssim))
 
             total_psnr += psnr
             total_ssim += ssim
@@ -132,9 +132,9 @@ class Trainer:
                 # validation
                 if self.do_validation and current_step % self.config['train']['val_freq'] == 0:
                     self.test_frcnn(current_step)
-                    if current_step % (self.config['train']['val_freq'] * 2) == 0:
-                        self.model.save(filename, current_step)
-                        self.model.save_training_state(epoch, current_step, filename)
+                if current_step % 10000 == 0:
+                    self.model.save(filename, current_step)
+                    self.model.save_training_state(epoch, current_step, filename)
 
         logger.info('Saving the final model.')
         self.model.save(filename, self.total_iters)
