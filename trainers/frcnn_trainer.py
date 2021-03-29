@@ -4,6 +4,7 @@ import numpy as np
 import torchvision
 import os
 import cv2
+import datetime
 from collections import OrderedDict
 from torch.nn.parallel import DistributedDataParallel
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
@@ -47,11 +48,11 @@ class FRCNNTrainer:
 
         # define training and validation data loaders
         data_loader = torch.utils.data.DataLoader(
-            dataset, batch_size=10, shuffle=True, num_workers=4,
+            dataset, batch_size=15, shuffle=True, num_workers=4,
             collate_fn=collate_fn)
 
         data_loader_test = torch.utils.data.DataLoader(
-            dataset_test, batch_size=10, shuffle=False, num_workers=4,
+            dataset_test, batch_size=15, shuffle=False, num_workers=4,
             collate_fn=collate_fn)
 
         return data_loader, data_loader_test
@@ -63,7 +64,8 @@ class FRCNNTrainer:
 
         lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
-        for epoch in range(self.num_epochs):
+        for epoch in range(1, self.num_epochs + 1):
+            print(datetime.datetime.now())
             # train for one epoch, printing every 10 iterations
             train_one_epoch(self.model, optimizer, self.data_loader, self.device, epoch, print_freq=50)
             # update the learning rate
@@ -72,6 +74,7 @@ class FRCNNTrainer:
             evaluate_base(self.model, self.data_loader_test, device=self.device)
             if epoch % 5 == 0:
                 self.save_model(self.model, 'FRCNN_LR_LR', epoch)
+        self.save_model(self.model, 'FRCNN_LR_LR', self.num_epochs)
 
     def save_model(self, network, network_label, iter_label):
         save_filename = '{}_{}.pth'.format(iter_label, network_label)
