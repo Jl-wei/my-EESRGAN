@@ -68,8 +68,8 @@ class Trainer:
             total_psnr += psnr
             total_ssim += ssim
 
-        avg_psnr = total_psnr / self.valid_data_loader.length
-        avg_ssim = total_ssim / self.valid_data_loader.length
+        avg_psnr = total_psnr / self.valid_data_loader.length * int(self.config['data_loader']['args']['batch_size'])
+        avg_ssim = total_ssim / self.valid_data_loader.length * int(self.config['data_loader']['args']['batch_size'])
 
         val_logger.info('##### Validation # PSNR: {:.4e}'.format(avg_psnr))
         val_logger.info('##### Validation # SSIM: {:.4e}'.format(avg_ssim))
