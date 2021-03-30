@@ -28,7 +28,9 @@ class FRCNNTrainer:
         # replace the pre-trained head with a new one
         self.model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
         self.model.to(self.device)
-        #self.load_model(self.config['pretrained_models']['FRCNN'], self.model)
+
+        if config['pretrained_models']['load']:
+            self.load_model(self.config['pretrained_models']['FRCNN'], self.model)
 
         self.data_loader, self.data_loader_test = self.data_loaders()
 
@@ -57,12 +59,15 @@ class FRCNNTrainer:
 
         return data_loader, data_loader_test
 
+    def test(self):
+        evaluate_base(self.model, self.data_loader_test, device=self.device)
+
     def train(self):
         params = [p for p in self.model.parameters() if p.requires_grad]
         optimizer = torch.optim.SGD(params, lr=0.005,
                                     momentum=0.9, weight_decay=0.0005)
 
-        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
 
         for epoch in range(1, self.num_epochs + 1):
             print(datetime.datetime.now())
