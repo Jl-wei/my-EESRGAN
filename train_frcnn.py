@@ -23,6 +23,9 @@ np.random.seed(SEED)
 if __name__ == '__main__':
     config = utils.read_json('./config_hripcb.json')
 
+    # config['pretrained_models']['load'] = True
+    # config['pretrained_models']['FRCNN'] = 'saved_hripcb/pretrained_models/10_FRCNN_HR_HR.pth'
     trainer = trainers.FRCNNTrainer(config)
     trainer.train()
+    # trainer.test()
 

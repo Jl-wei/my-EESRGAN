@@ -19,7 +19,7 @@ class FRCNNTrainer:
         n_gpu = torch.cuda.device_count()
         self.device = torch.device('cuda:0' if n_gpu > 0 else 'cpu')
 
-        self.num_epochs = 25
+        self.num_epochs = 100
 
         self.model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
         num_classes = self.config['detector']['num_classes'] # object and background
@@ -43,10 +43,10 @@ class FRCNNTrainer:
 
     def data_loaders(self):
         # use our dataset and defined transformations
-        dataset = FRCNNDataset(root=self.config['data_loader']['train']['LR_img_dir'],
-                    image_height=64, image_width=64, transforms=self.get_transform(train=True))
-        dataset_test = FRCNNDataset(root=self.config['data_loader']['valid']['LR_img_dir'],
-                    image_height=64, image_width=64, transforms=self.get_transform(train=False))
+        dataset = FRCNNDataset(root=self.config['data_loader']['train']['HR_img_dir'],
+                    image_height=256, image_width=256, transforms=self.get_transform(train=True))
+        dataset_test = FRCNNDataset(root=self.config['data_loader']['valid']['HR_img_dir'],
+                    image_height=256, image_width=256, transforms=self.get_transform(train=False))
 
         # define training and validation data loaders
         data_loader = torch.utils.data.DataLoader(
@@ -60,14 +60,14 @@ class FRCNNTrainer:
         return data_loader, data_loader_test
 
     def test(self):
-        evaluate_base(self.model, self.data_loader_test, device=self.device)
+        evaluate_base(self.model, self.data_loader, device=self.device)
 
     def train(self):
         params = [p for p in self.model.parameters() if p.requires_grad]
         optimizer = torch.optim.SGD(params, lr=0.005,
                                     momentum=0.9, weight_decay=0.0005)
 
-        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.1)
 
         for epoch in range(1, self.num_epochs + 1):
             print(datetime.datetime.now())
@@ -77,9 +77,9 @@ class FRCNNTrainer:
             lr_scheduler.step()
             # evaluate on the test dataset
             evaluate_base(self.model, self.data_loader_test, device=self.device)
-            if epoch % 5 == 0:
-                self.save_model(self.model, 'FRCNN_LR_LR', epoch)
-        self.save_model(self.model, 'FRCNN_LR_LR', self.num_epochs)
+            if epoch % 10 == 0:
+                self.save_model(self.model, 'FRCNN_HR_HR', epoch)
+        self.save_model(self.model, 'FRCNN_HR_HR', self.num_epochs)
 
     def save_model(self, network, network_label, iter_label):
         save_filename = '{}_{}.pth'.format(iter_label, network_label)
