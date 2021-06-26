@@ -129,7 +129,7 @@ class EESN_FRCNN_GAN(GANBaseModel):
                 weight_params.append(self.l_inter_w)
         self.optimizer_G = torch.optim.Adam([ 
                                                 {'params': optim_params},
-                                                {'params': weight_params, 'lr': 1e-4},
+                                                {'params': weight_params},
                                             ], lr=self.configO['lr_G'],
                                             weight_decay=wd_G,
                                             betas=(self.configO['beta1_G'], self.configO['beta2_G']))
@@ -221,13 +221,13 @@ class EESN_FRCNN_GAN(GANBaseModel):
         if step % self.D_update_ratio == 0 and step > self.D_init_iters:
             if self.configT['intermediate_loss']:
                 if self.configT['intermediate_learned']:
-                    l_g_inter = (1 / (2 * torch.square(self.l_inter_w))) * self.cri_pix(self.intermediate_in, self.intermediate_out)
+                    l_g_inter = torch.square(torch.log(self.l_inter_w)) + (1 / (2 * torch.square(self.l_inter_w))) * self.cri_pix(self.intermediate_in, self.intermediate_out)
                 else:
                     l_g_inter = self.l_inter_w * self.cri_pix(self.intermediate_in, self.intermediate_out)
                 l_g_total += l_g_inter
             if self.cri_pix: # pixel loss
                 if self.configT['learned_weight']:
-                    l_g_pix = (1 / (2 * torch.square(self.l_pix_w))) * self.cri_pix(self.fake_H, self.var_H)
+                    l_g_pix = (torch.exp(self.l_pix_w) / (torch.exp(self.l_pix_w) + torch.exp(self.l_fea_w))) * self.cri_pix(self.fake_H, self.var_H)
                 else:
                     l_g_pix = self.l_pix_w * self.cri_pix(self.fake_H, self.var_H)
                 l_g_total += l_g_pix
@@ -235,13 +235,11 @@ class EESN_FRCNN_GAN(GANBaseModel):
                 real_fea = self.netF(self.var_H).detach() # don't want to backpropagate this, need proper explanation
                 fake_fea = self.netF(self.fake_H) # In netF normalize=False, check it
                 if self.configT['learned_weight']:
-                    l_g_fea = (1 / (2 * torch.square(self.l_fea_w))) * self.cri_fea(fake_fea, real_fea)
+                    l_g_fea = (torch.exp(self.l_fea_w) / (torch.exp(self.l_pix_w) + torch.exp(self.l_fea_w))) * self.cri_fea(fake_fea, real_fea)
                 else:
                     l_g_fea = self.l_fea_w * self.cri_fea(fake_fea, real_fea)
                 l_g_total += l_g_fea
 
-            if self.configT['learned_weight'] and self.cri_pix and self.cri_fea:
-                l_g_total += torch.log(self.l_pix_w * self.l_fea_w)
 
             pred_g_fake = self.netD(self.fake_H)
             if self.configT['gan_type'] == 'gan':
@@ -300,11 +298,11 @@ class EESN_FRCNN_GAN(GANBaseModel):
         if self.cri_pix:
             self.log_dict['l_g_pix'] = l_g_pix.item()
             if self.configT['learned_weight']:
-                self.log_dict['weight_pix'] = (1 / (2 * torch.square(self.l_pix_w))).item()
+                self.log_dict['weight_pix'] = (torch.exp(self.l_pix_w) / (torch.exp(self.l_pix_w) + torch.exp(self.l_fea_w))).item()
         if self.cri_fea:
             self.log_dict['l_g_fea'] = l_g_fea.item()
             if self.configT['learned_weight']:
-                self.log_dict['weight_fea'] = (1 / (2 * torch.square(self.l_fea_w))).item()
+                self.log_dict['weight_fea'] = (torch.exp(self.l_fea_w) / (torch.exp(self.l_pix_w) + torch.exp(self.l_fea_w))).item()
         #     self.log_dict['l_g_gan'] = l_g_gan.item()
         #     self.log_dict['l_e_charbonnier'] = l_e_charbonnier.item()
 
