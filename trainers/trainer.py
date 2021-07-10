@@ -132,9 +132,9 @@ class Trainer:
                 # validation
                 if self.do_validation and current_step % self.config['train']['val_freq'] == 0:
                     self.test_frcnn(current_step)
-                if current_step % 10000 == 0:
-                    self.model.save(filename, current_step)
-                    self.model.save_training_state(epoch, current_step, filename)
+                # if current_step % 10000 == 0:
+                #     self.model.save(filename, current_step)
+                #     self.model.save_training_state(epoch, current_step, filename)
 
         logger.info('Saving the final model.')
         self.model.save(filename, self.total_iters)
