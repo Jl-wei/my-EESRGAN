@@ -142,17 +142,21 @@ def evaluate(model_G, model_FRCNN, data_loader, device):
     coco_evaluator = CocoEvaluator(coco, iou_types)
 
     for image, targets in metric_logger.log_every(data_loader, 100, header):
+        img_path = image['LQ_path'][0]
+        
         image['image_lq'] = image['image_lq'].to(device)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
         torch.cuda.synchronize()
         model_time = time.time()
+
         _, image, _, _ , _, _= model_G(image['image_lq'])
         img_count = image.size()[0]
         image = [image[i] for i in range(img_count)]
         outputs = model_FRCNN(image)
-
         outputs = [{k: v.to(cpu_device) for k, v in t.items()} for t in outputs]
+        draw_box(img_path, outputs[0]['boxes'], outputs[0]['scores'])
+
         model_time = time.time() - model_time
 
         res = {target["image_id"].item(): output for target, output in zip(targets, outputs)}
@@ -171,6 +175,18 @@ def evaluate(model_G, model_FRCNN, data_loader, device):
     coco_evaluator.summarize()
     torch.set_num_threads(n_threads)
     return coco_evaluator
+
+def draw_box(img_path, boxes, scores, check_dir='/home/jlwei/PCB-EESRGAN/dataset/PCB_DATASET/detected'):
+    img = cv2.imread(img_path)
+
+    for i in range(len(boxes)):
+        img_height, img_width, _ = img.shape
+        left, top, right, bottom = [int(i) for i in boxes[i].tolist()]
+        cv2.rectangle(img, (left, top), (right, bottom), (255,0,0), 2)
+        cv2.putText(img, "{:.3%}".format(scores[i].item()), (left, top - 12), 0, 1e-3 * img_height, (255,0,0), 1)
+
+    img_name = os.path.basename(img_path)
+    cv2.imwrite(os.path.join(check_dir, img_name), img)
 
 @torch.no_grad()
 def evaluate_base(model, data_loader, device):
