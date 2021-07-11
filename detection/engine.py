@@ -182,11 +182,15 @@ def draw_box(img_path, boxes, labels, scores, check_dir='/home/jlwei/PCB-EESRGAN
     sr_img_path = os.path.join(sr_img_folder_path, os.path.splitext(img_name)[0]+'_final_SR.png')
     img = cv2.imread(sr_img_path)
 
-    for i in range(len(boxes)):
-        img_height, img_width, _ = img.shape
-        left, top, right, bottom = [int(i) for i in boxes[i].tolist()]
-        cv2.rectangle(img, (left, top), (right, bottom), (0,0,255), 2)
-        cv2.putText(img, "Class: {:}; Percent: {:.3%}".format(labels[i].item(), scores[i].item()), (left, top - 12), 0, 2e-3 * img_height, (0,0,255), 1)
+    with open(os.path.join(sr_img_folder_path, "boxes.txt"), "w") as f:
+        for i in range(len(boxes)):
+            img_height, img_width, _ = img.shape
+            left, top, right, bottom = [int(i) for i in boxes[i].tolist()]
+            cv2.rectangle(img, (left, top), (right, bottom), (0,0,255), 2)
+            cv2.putText(img, "Class: {:}; Percent: {:.2%}".format(labels[i].item(), scores[i].item()), (left, top - 12), 0, 2e-3 * img_height, (0,0,255), 1)
+
+            f.write("{} {:.2%} {} {} {} {}\n".format(labels[i].item(), scores[i].item(), left, top, right, bottom))
+
 
     cv2.imwrite(os.path.join(sr_img_folder_path, os.path.splitext(img_name)[0]+'_detected.png'), img)
 
